@@ -14,3 +14,12 @@
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.log filter=lfs diff=lfs merge=lfs -text
 *.ini filter=lfs diff=lfs merge=lfs -text
+*.target filter=lfs diff=lfs merge=lfs -text
+*.pdb filter=lfs diff=lfs merge=lfs -text
+*.uhtmanifest filter=lfs diff=lfs merge=lfs -text
+*.json filter=lfs diff=lfs merge=lfs -text
+*.dat filter=lfs diff=lfs merge=lfs -text
+*.vcxproj filter=lfs diff=lfs merge=lfs -text
+*.filters filter=lfs diff=lfs merge=lfs -text
+*.runtime-xml filter=lfs diff=lfs merge=lfs -text
+*.dmp filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,13 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\intermediate\\build\\win64\\unrealeditor\\inc\\thirdpersonv2\\uht\\thirdpersonv2.init.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\intermediate\\build\\win64\\x64\\thirdpersonv2editor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_0.h.pch",
+        "Includes": [
+            "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\thirdpersonv2\\definitions.thirdpersonv2.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

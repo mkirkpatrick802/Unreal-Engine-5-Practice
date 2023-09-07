@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"C:\\Users\\Michael\\Documents\\Unreal Projects\\Unreal Engine 5 Practice\\ThirdPersonV2\\Source\\ThirdPersonV2\\ThirdPersonV2.Build.cs",
+		"C:\\Users\\Michael\\Documents\\Unreal Projects\\Unreal Engine 5 Practice\\ThirdPersonV2\\Source\\ThirdPersonV2.Target.cs",
+		"C:\\Users\\Michael\\Documents\\Unreal Projects\\Unreal Engine 5 Practice\\ThirdPersonV2\\Source\\ThirdPersonV2Editor.Target.cs"
+	],
+	"EngineVersion": "5.2.1"
+}

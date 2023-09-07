@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "ThirdPersonV2",
+			"Path": "C:\\Users\\Michael\\Documents\\Unreal Projects\\Unreal Engine 5 Practice\\ThirdPersonV2\\Source\\ThirdPersonV2.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "ThirdPersonV2Editor",
+			"Path": "C:\\Users\\Michael\\Documents\\Unreal Projects\\Unreal Engine 5 Practice\\ThirdPersonV2\\Source\\ThirdPersonV2Editor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
