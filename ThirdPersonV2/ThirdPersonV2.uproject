@@ -3,7 +3,6 @@
 	"EngineAssociation": "5.2",
 	"Category": "",
 	"Description": "",
-<<<<<<< HEAD
 	"Modules": [
 		{
 			"Name": "ThirdPersonV2",
@@ -15,8 +14,6 @@
 			]
 		}
 	],
-=======
->>>>>>> 08b98c30782825757c6756e987745bfe5832aca6
 	"Plugins": [
 		{
 			"Name": "ModelingToolsEditorMode",

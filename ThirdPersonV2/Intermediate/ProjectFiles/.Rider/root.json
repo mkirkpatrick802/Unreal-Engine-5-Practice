@@ -1,29 +1,3 @@
-{
-	"ConfigurationsAndPlatforms": [
-		{
-			"Configuration": "DebugGame",
-			"Platform": "Win64",
-			"Target": "Editor"
-		},
-		{
-			"Configuration": "DebugGame",
-			"Platform": "Win64",
-			"Target": "Game"
-		},
-		{
-			"Configuration": "Development",
-			"Platform": "Win64",
-			"Target": "Editor"
-		},
-		{
-			"Configuration": "Development",
-			"Platform": "Win64",
-			"Target": "Game"
-		},
-		{
-			"Configuration": "Shipping",
-			"Platform": "Win64",
-			"Target": "Game"
-		}
-	]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f3e811bde4f932e4a112db3379961bad6adc0ed9cd61ec42eb024a491f717639
+size 503
