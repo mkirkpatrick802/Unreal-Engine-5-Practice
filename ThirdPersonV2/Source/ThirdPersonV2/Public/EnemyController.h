@@ -1,7 +1,9 @@
 #pragma once
 
 #include "EnemyCharacter.h"
+#include "Math/Vector.h"
 
+//Last Header
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "EnemyController.generated.h"
@@ -16,6 +18,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Utility|")
 		void InitController();
 
-
 private:
+
 };
