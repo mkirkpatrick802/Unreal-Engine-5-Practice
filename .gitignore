@@ -71,6 +71,7 @@ Intermediate/*
 Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
+<<<<<<< HEAD
 DerivedDataCache/*
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -471,3 +472,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+=======
+DerivedDataCache/*
+>>>>>>> 08b98c30782825757c6756e987745bfe5832aca6
