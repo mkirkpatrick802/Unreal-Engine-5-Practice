@@ -1,14 +1,3 @@
-{
-    "Version": "1.2",
-    "Data": {
-        "Source": "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\source\\thirdpersonv2\\thirdpersonv2.cpp",
-        "ProvidedModule": "",
-        "PCH": "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\intermediate\\build\\win64\\x64\\thirdpersonv2editor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_0.h.pch",
-        "Includes": [
-            "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\thirdpersonv2\\definitions.thirdpersonv2.h",
-            "c:\\users\\michael\\documents\\unreal projects\\unreal engine 5 practice\\thirdpersonv2\\source\\thirdpersonv2\\thirdpersonv2.h"
-        ],
-        "ImportedModules": [],
-        "ImportedHeaderUnits": []
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:58144021652d7a17210dfbec7720fcc91cf357bd7ed813599703ffeba6f82632
+size 923
