@@ -9,17 +9,13 @@
 UCLASS()
 class THIRDPERSONV2_API AEnemyController : public AAIController
 {
+public:
+
 	GENERATED_BODY()
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Utility|")
 		void InitController();
 
 
-	UBlackboardComponent* GetBlackBoard();
-	void SetBlackBoard(UBlackboardComponent* blackboard);
-
 private:
-
-	UBlackboardComponent* _blackboard;
-
 };

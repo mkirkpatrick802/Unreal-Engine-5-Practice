@@ -1,11 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
-
 
 UENUM(BlueprintType)
 enum EEnemyState
@@ -17,9 +14,13 @@ enum EEnemyState
 UCLASS()
 class THIRDPERSONV2_API AEnemyCharacter : public ACharacter
 {
+public:
+
 	GENERATED_BODY()
 
-public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Enums|")
+		TEnumAsByte <EEnemyState> EnemyState;
+
 	// Sets default values for this character's properties
 	AEnemyCharacter();
 
