@@ -23,7 +23,7 @@ public:
 	void AddForceDirection(FVector directionToBeAdded);
 
 
-	void Move();
+	//void Move();
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
 
 private:
