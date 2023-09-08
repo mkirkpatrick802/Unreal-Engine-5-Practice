@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EnemyController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 //Last Header
 #include "CoreMinimal.h"
@@ -9,7 +11,7 @@
 UENUM(BlueprintType)
 enum EEnemyState
 {
-	IdleWander		UMETA(DisplayName = "Wander"),
+	Wander		UMETA(DisplayName = "Wandering"),
 	Flocking		UMETA(DisplayName = "Flocking"),
 };
 
@@ -26,18 +28,22 @@ public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
-
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+
+protected:
+
+
+
 private:
+
+	AEnemyController* _controller;
 
 };

@@ -37,7 +37,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyCharacter() {}
 		static const UECodeGen_Private::FEnumParams EnumParams;
 	};
 	const UECodeGen_Private::FEnumeratorParam Z_Construct_UEnum_ThirdPersonV2_EEnemyState_Statics::Enumerators[] = {
-		{ "IdleWander", (int64)IdleWander },
+		{ "Wander", (int64)Wander },
 		{ "Flocking", (int64)Flocking },
 	};
 #if WITH_METADATA
@@ -45,9 +45,9 @@ void EmptyLinkFunctionForGeneratedCodeEnemyCharacter() {}
 		{ "BlueprintType", "true" },
 		{ "Flocking.DisplayName", "Flocking" },
 		{ "Flocking.Name", "Flocking" },
-		{ "IdleWander.DisplayName", "Wander" },
-		{ "IdleWander.Name", "IdleWander" },
 		{ "ModuleRelativePath", "Public/EnemyCharacter.h" },
+		{ "Wander.DisplayName", "Wandering" },
+		{ "Wander.Name", "Wander" },
 	};
 #endif
 	const UECodeGen_Private::FEnumParams Z_Construct_UEnum_ThirdPersonV2_EEnemyState_Statics::EnumParams = {
@@ -109,7 +109,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyCharacter() {}
 		{ "ModuleRelativePath", "Public/EnemyCharacter.h" },
 	};
 #endif
-	const UECodeGen_Private::FBytePropertyParams Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState = { "EnemyState", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Byte, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(AEnemyCharacter, EnemyState), Z_Construct_UEnum_ThirdPersonV2_EEnemyState, METADATA_PARAMS(Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState_MetaData)) }; // 1981037268
+	const UECodeGen_Private::FBytePropertyParams Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState = { "EnemyState", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Byte, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(AEnemyCharacter, EnemyState), Z_Construct_UEnum_ThirdPersonV2_EEnemyState, METADATA_PARAMS(Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState_MetaData)) }; // 2743544538
 	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AEnemyCharacter_Statics::PropPointers[] = {
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AEnemyCharacter_Statics::NewProp_EnemyState,
 	};
@@ -145,19 +145,19 @@ void EmptyLinkFunctionForGeneratedCodeEnemyCharacter() {}
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AEnemyCharacter);
 	AEnemyCharacter::~AEnemyCharacter() {}
-	struct Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics
+	struct Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics
 	{
 		static const FEnumRegisterCompiledInInfo EnumInfo[];
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo[] = {
-		{ EEnemyState_StaticEnum, TEXT("EEnemyState"), &Z_Registration_Info_UEnum_EEnemyState, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 1981037268U) },
+	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo[] = {
+		{ EEnemyState_StaticEnum, TEXT("EEnemyState"), &Z_Registration_Info_UEnum_EEnemyState, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 2743544538U) },
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AEnemyCharacter, AEnemyCharacter::StaticClass, TEXT("AEnemyCharacter"), &Z_Registration_Info_UClass_AEnemyCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyCharacter), 3013253344U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_AEnemyCharacter, AEnemyCharacter::StaticClass, TEXT("AEnemyCharacter"), &Z_Registration_Info_UClass_AEnemyCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyCharacter), 4270986909U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_2467987776(TEXT("/Script/ThirdPersonV2"),
-		Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_1860909147(TEXT("/Script/ThirdPersonV2"),
+		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::ClassInfo),
 		nullptr, 0,
-		Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo));
+		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyCharacter_h_Statics::EnumInfo));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

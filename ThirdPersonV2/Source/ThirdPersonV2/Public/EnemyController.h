@@ -1,7 +1,8 @@
 #pragma once
 
-#include "EnemyCharacter.h"
 #include "Math/Vector.h"
+#include "Math/UnrealMathUtility.h"
+#include "NavigationSystem.h"
 
 //Last Header
 #include "CoreMinimal.h"
@@ -18,6 +19,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Utility|")
 		void InitController();
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Movement|")
+	void AddForceDirection(FVector directionToBeAdded);
+
+
+	void Move();
+	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
+
 private:
+
+	//Constants
+	const float _dampingConstant = .2;
+	const float _wanderingConstant = 1000;
+
+	FVector _currentForceDirection;
 
 };
