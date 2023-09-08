@@ -26,9 +26,4 @@ void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	_controller->Move();
-
-	//if (!_controller) return;
-	//_controller->Move();
-
 }
