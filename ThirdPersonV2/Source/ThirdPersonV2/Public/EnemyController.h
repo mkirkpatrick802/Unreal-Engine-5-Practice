@@ -30,7 +30,6 @@ private:
 
 	//Constants
 	const float _dampingConstant = .2;
-	const float _wanderingConstant = 1000;
 
 	FVector _currentForceDirection;
 
