@@ -11,7 +11,7 @@
 UENUM(BlueprintType)
 enum EEnemyState
 {
-	Wander		UMETA(DisplayName = "Wandering"),
+	Wander			UMETA(DisplayName = "Wandering"),
 	Flocking		UMETA(DisplayName = "Flocking"),
 };
 
@@ -45,5 +45,6 @@ protected:
 private:
 
 	AEnemyController* _controller;
+	const float _wanderingConstant = 1000;
 
 };
