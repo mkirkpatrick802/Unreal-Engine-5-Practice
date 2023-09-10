@@ -11,10 +11,19 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 // Cross Module References
 	AIMODULE_API UClass* Z_Construct_UClass_AAIController();
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector();
+	ENGINE_API UClass* Z_Construct_UClass_AActor_NoRegister();
 	THIRDPERSONV2_API UClass* Z_Construct_UClass_AEnemyController();
 	THIRDPERSONV2_API UClass* Z_Construct_UClass_AEnemyController_NoRegister();
 	UPackage* Z_Construct_UPackage__Script_ThirdPersonV2();
 // End Cross Module References
+	DEFINE_FUNCTION(AEnemyController::execFlocking)
+	{
+		P_GET_TARRAY_REF(AActor*,Z_Param_Out_neighbours);
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		P_THIS->Flocking(Z_Param_Out_neighbours);
+		P_NATIVE_END;
+	}
 	DEFINE_FUNCTION(AEnemyController::execAddForceDirection)
 	{
 		P_GET_STRUCT(FVector,Z_Param_directionToBeAdded);
@@ -35,6 +44,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		UClass* Class = AEnemyController::StaticClass();
 		static const FNameNativePtrPair Funcs[] = {
 			{ "AddForceDirection", &AEnemyController::execAddForceDirection },
+			{ "Flocking", &AEnemyController::execFlocking },
 			{ "InitController", &AEnemyController::execInitController },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, UE_ARRAY_COUNT(Funcs));
@@ -69,6 +79,50 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		if (!ReturnFunction)
 		{
 			UECodeGen_Private::ConstructUFunction(&ReturnFunction, Z_Construct_UFunction_AEnemyController_AddForceDirection_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
+	struct Z_Construct_UFunction_AEnemyController_Flocking_Statics
+	{
+		struct EnemyController_eventFlocking_Parms
+		{
+			TArray<AActor*> neighbours;
+		};
+		static const UECodeGen_Private::FObjectPropertyParams NewProp_neighbours_Inner;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_neighbours_MetaData[];
+#endif
+		static const UECodeGen_Private::FArrayPropertyParams NewProp_neighbours;
+		static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UECodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_Inner = { "neighbours", nullptr, (EPropertyFlags)0x0000000000000000, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, 0, Z_Construct_UClass_AActor_NoRegister, METADATA_PARAMS(nullptr, 0) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_MetaData[] = {
+		{ "NativeConst", "" },
+	};
+#endif
+	const UECodeGen_Private::FArrayPropertyParams Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours = { "neighbours", nullptr, (EPropertyFlags)0x0010000008000182, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(EnemyController_eventFlocking_Parms, neighbours), EArrayPropertyFlags::None, METADATA_PARAMS(Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_MetaData, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_MetaData)) };
+	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_AEnemyController_Flocking_Statics::PropPointers[] = {
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_Inner,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours,
+	};
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AEnemyController_Flocking_Statics::Function_MetaDataParams[] = {
+		{ "Category", "Enemy|Movement|" },
+		{ "ModuleRelativePath", "Public/EnemyController.h" },
+	};
+#endif
+	const UECodeGen_Private::FFunctionParams Z_Construct_UFunction_AEnemyController_Flocking_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_AEnemyController, nullptr, "Flocking", nullptr, nullptr, sizeof(Z_Construct_UFunction_AEnemyController_Flocking_Statics::EnemyController_eventFlocking_Parms), Z_Construct_UFunction_AEnemyController_Flocking_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_Flocking_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x04420401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_AEnemyController_Flocking_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_Flocking_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_AEnemyController_Flocking()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UECodeGen_Private::ConstructUFunction(&ReturnFunction, Z_Construct_UFunction_AEnemyController_Flocking_Statics::FuncParams);
 		}
 		return ReturnFunction;
 	}
@@ -116,6 +170,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_AEnemyController_Statics::FuncInfo[] = {
 		{ &Z_Construct_UFunction_AEnemyController_AddForceDirection, "AddForceDirection" }, // 751657149
+		{ &Z_Construct_UFunction_AEnemyController_Flocking, "Flocking" }, // 2940189943
 		{ &Z_Construct_UFunction_AEnemyController_InitController, "InitController" }, // 1259502489
 	};
 #if WITH_METADATA
@@ -163,9 +218,9 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
 	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 125584826U) },
+		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 2113224321U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_1969607010(TEXT("/Script/ThirdPersonV2"),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_3634439289(TEXT("/Script/ThirdPersonV2"),
 		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);

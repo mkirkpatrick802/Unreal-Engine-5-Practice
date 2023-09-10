@@ -1,4 +1,5 @@
 #include "EnemyCharacter.h"
+#include "NavigationSystem.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -26,16 +27,37 @@ void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    FString VelocityString = _controller->GetCurrentForceDirection().ToString();
+	if (!_controller) return;
+	Move();
+}
 
-    // Set up the debug message parameters
-    FColor Color = FColor::White; // Text color
-    float DisplayTime = 1.0f;    // Display time in seconds
-    FVector2D TextScale = FVector2D(1.0f, 1.0f); // Text scale
+void AEnemyCharacter::Move()
+{
+	FVector dir = _controller->GetCurrentForceDirection();
 
-    // Display the velocity on the screen
-    GEngine->AddOnScreenDebugMessage(1, DisplayTime, Color, VelocityString, false, TextScale);
+	if(!IsCharacterLeavingNavmesh())
+	{
+		dir.X *= -1;
 
-	AddMovementInput(_controller->GetCurrentForceDirection(), _wanderingConstant, true);
+		double x = dir.X;
+		double y = dir.Y;
 
+		dir.Y = x;
+		dir.X = y;
+	}
+
+	AddMovementInput(dir, _wanderingConstant, true);
+}
+
+bool AEnemyCharacter::IsCharacterLeavingNavmesh()
+{
+	FNavLocation navLoc;
+	FVector queryExtent = FVector(50, 50, 250);
+	FNavAgentProperties navAgentProperties;
+	navAgentProperties.AgentHeight = 180;
+	navAgentProperties.AgentRadius = 40;
+
+	UNavigationSystemV1* NavSystem = Cast<UNavigationSystemV1>(GetWorld()->GetNavigationSystem());
+
+	return NavSystem->ProjectPointToNavigation(GetActorLocation(), navLoc, queryExtent);
 }

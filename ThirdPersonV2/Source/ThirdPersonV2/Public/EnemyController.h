@@ -22,8 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Movement|")
 	void AddForceDirection(FVector directionToBeAdded);
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Movement|")
+	void Flocking(const TArray<AActor*>& neighbours);
 
-	//void Move();
+	void SetCurrentForceDirection(FVector dir) { _currentForceDirection = dir; }
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
 
 private:
