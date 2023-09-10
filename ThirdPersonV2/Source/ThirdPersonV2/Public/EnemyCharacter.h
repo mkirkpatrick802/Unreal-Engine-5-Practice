@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EnemyController.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 //Last Header
 #include "CoreMinimal.h"
@@ -36,6 +35,10 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void Move();
+
+	bool IsCharacterLeavingNavmesh();
 
 
 protected:

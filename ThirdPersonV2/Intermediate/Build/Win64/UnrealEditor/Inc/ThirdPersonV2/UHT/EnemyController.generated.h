@@ -9,6 +9,7 @@
 #include "UObject/ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+class AActor;
 #ifdef THIRDPERSONV2_EnemyController_generated_h
 #error "EnemyController.generated.h already included, missing '#pragma once' in EnemyController.h"
 #endif
@@ -17,12 +18,14 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #define FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_17_SPARSE_DATA
 #define FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_17_RPC_WRAPPERS \
  \
+	DECLARE_FUNCTION(execFlocking); \
 	DECLARE_FUNCTION(execAddForceDirection); \
 	DECLARE_FUNCTION(execInitController);
 
 
 #define FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_17_RPC_WRAPPERS_NO_PURE_DECLS \
  \
+	DECLARE_FUNCTION(execFlocking); \
 	DECLARE_FUNCTION(execAddForceDirection); \
 	DECLARE_FUNCTION(execInitController);
 
