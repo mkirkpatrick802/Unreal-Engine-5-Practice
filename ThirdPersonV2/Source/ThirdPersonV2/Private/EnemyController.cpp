@@ -13,10 +13,11 @@ void AEnemyController::AddForceDirection(FVector directionToBeAdded)
     _currentForceDirection = _currentForceDirection.GetSafeNormal();
 }
 
-void AEnemyController::Flocking(const TArray<AActor*>& neighbours, int length)
+void AEnemyController::Flocking(const TArray<AActor*>& c_neighbours, int c_length, const TArray<AActor*>& s_neighbours, int s_length)
 {
-	CalculateSeperationDirection(neighbours, length);
-    CalculateCohesionDirection(neighbours, length);
+	CalculateSeperationDirection(s_neighbours, s_length);
+    CalculateCohesionDirection(c_neighbours, c_length);
+    CalculateAlignmentDirection(c_neighbours, c_length);
 }
 
 void AEnemyController::CalculateSeperationDirection(const TArray<AActor*>& neighbours, int length)
@@ -48,8 +49,9 @@ void AEnemyController::CalculateAlignmentDirection(const TArray<AActor*>& neighb
     FVector averageVelocity;
     for (auto i = 0; i < length; ++i)
     {
-        //averageVelocity += i->getVel();
+        averageVelocity += neighbours[i]->GetVelocity();
     }
+    averageVelocity += GetCharacter()->GetVelocity();
 
     averageVelocity = averageVelocity / length + 1;
     alignmentDirection = averageVelocity;

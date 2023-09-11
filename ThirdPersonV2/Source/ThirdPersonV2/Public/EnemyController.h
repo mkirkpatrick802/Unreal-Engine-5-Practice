@@ -22,7 +22,7 @@ public:
 		void AddForceDirection(FVector directionToBeAdded);
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Movement|")
-		void Flocking(const TArray<AActor*>& neighbours, int length);
+		void Flocking(const TArray<AActor*>& c_neighbours, int c_length, const TArray<AActor*>& s_neighbours, int s_length);
 
 	//Flocking Calculations
 	void CalculateSeperationDirection(const TArray<AActor*>& neighbours, int length);
@@ -32,10 +32,10 @@ public:
 	void SetCurrentForceDirection(FVector dir) { _currentForceDirection = dir; }
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
 
-	const float separationConstant = 1000;
 	const float wanderingConstant = 1000;
-	const float cohesionConstant = 1000;
-	const float alignmentConstant = 1000;
+	const float separationConstant = 700;
+	const float cohesionConstant = 625;
+	const float alignmentConstant = 50;
 
 	FVector separationDirection;
 	FVector cohesionDirection;
