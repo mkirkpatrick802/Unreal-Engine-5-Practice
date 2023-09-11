@@ -39,7 +39,7 @@ public:
 	void Move();
 
 	bool IsCharacterLeavingNavmesh();
-
+	void StartReturnCooldown();
 
 protected:
 
@@ -47,9 +47,6 @@ protected:
 
 private:
 
-	AEnemyController* _controller;
-	const float _wanderingConstant = 1000;
-
 	bool _atBorder = false;
-
+	AEnemyController* _controller;
 };
