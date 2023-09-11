@@ -41,12 +41,16 @@ public:
 	bool IsCharacterLeavingNavmesh();
 	void StartReturnCooldown();
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy|State|")
+		void SetCurrentState(EEnemyState state) { currentState = state; }
+
 protected:
 
 
 
 private:
 
+	EEnemyState currentState;
 	bool _atBorder = false;
 	AEnemyController* _controller;
 };

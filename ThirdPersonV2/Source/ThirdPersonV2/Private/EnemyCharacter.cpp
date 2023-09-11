@@ -33,7 +33,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 void AEnemyCharacter::Move()
 {
-	FVector randomDir = _controller->GetCurrentForceDirection();
+	FVector dir = _controller->GetCurrentForceDirection();
 
 	if(IsCharacterLeavingNavmesh() || _atBorder)
 	{
@@ -42,19 +42,23 @@ void AEnemyCharacter::Move()
 	}
 	else
 	{
-		/*if (EnemyState.GetValue() == EEnemyState::Wander)
-			AddMovementInput(randomDir, _controller->wanderingConstant, true);
+		if (currentState == EEnemyState::Wander)
+		{
+			AddMovementInput(dir, _controller->wanderingConstant, true);
+		}
 		else
 		{
+			AddMovementInput(dir, _controller->wanderingConstant, true);
+
 			//Seperation
 			AddMovementInput(_controller->separationDirection, _controller->separationConstant, true);
 
 			//Cohesion
-			//AddMovementInput(_controller->cohesionDirection, _controller->cohesionConstant, true);
+			AddMovementInput(_controller->cohesionDirection, _controller->cohesionConstant, true);
 
 			//Alignment
-			//AddMovementInput(_controller->alignmentDirection, _controller->alignmentConstant, true);
-		}*/
+			AddMovementInput(_controller->alignmentDirection, _controller->alignmentConstant, true);
+		}
 	}
 }
 
@@ -81,7 +85,7 @@ bool AEnemyCharacter::IsCharacterLeavingNavmesh()
 
 void AEnemyCharacter::StartReturnCooldown()
 {
-	float cooldownTime = 2;
+	float cooldownTime = 1;
 	FTimerHandle TimerHandle;
 
 	GetWorldTimerManager().SetTimer(TimerHandle, [this]() {
