@@ -33,15 +33,29 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 void AEnemyCharacter::Move()
 {
-	FVector dir = _controller->GetCurrentForceDirection();
+	FVector randomDir = _controller->GetCurrentForceDirection();
 
-	if(!IsCharacterLeavingNavmesh())
+	if(IsCharacterLeavingNavmesh() || _atBorder)
 	{
-		dir.X *= -1;
-		dir.Y *= -1;
+		FVector originDir = FVector(0, 0, 0) - GetActorLocation();
+		AddMovementInput(originDir, _controller->wanderingConstant, true);
 	}
+	else
+	{
+		/*if (EnemyState.GetValue() == EEnemyState::Wander)
+			AddMovementInput(randomDir, _controller->wanderingConstant, true);
+		else
+		{
+			//Seperation
+			AddMovementInput(_controller->separationDirection, _controller->separationConstant, true);
 
-	AddMovementInput(dir, _wanderingConstant, true);
+			//Cohesion
+			//AddMovementInput(_controller->cohesionDirection, _controller->cohesionConstant, true);
+
+			//Alignment
+			//AddMovementInput(_controller->alignmentDirection, _controller->alignmentConstant, true);
+		}*/
+	}
 }
 
 bool AEnemyCharacter::IsCharacterLeavingNavmesh()
@@ -53,6 +67,26 @@ bool AEnemyCharacter::IsCharacterLeavingNavmesh()
 	navAgentProperties.AgentRadius = 40;
 
 	UNavigationSystemV1* NavSystem = Cast<UNavigationSystemV1>(GetWorld()->GetNavigationSystem());
+	if(!NavSystem->ProjectPointToNavigation(GetActorLocation(), navLoc, queryExtent))
+	{
+		_atBorder = true;
+		StartReturnCooldown();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
-	return NavSystem->ProjectPointToNavigation(GetActorLocation(), navLoc, queryExtent);
+void AEnemyCharacter::StartReturnCooldown()
+{
+	float cooldownTime = 2;
+	FTimerHandle TimerHandle;
+
+	GetWorldTimerManager().SetTimer(TimerHandle, [this]() {
+
+		_atBorder = false;
+
+		}, cooldownTime, false);
 }

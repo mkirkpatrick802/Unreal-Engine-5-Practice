@@ -19,9 +19,10 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	DEFINE_FUNCTION(AEnemyController::execFlocking)
 	{
 		P_GET_TARRAY_REF(AActor*,Z_Param_Out_neighbours);
+		P_GET_PROPERTY(FIntProperty,Z_Param_length);
 		P_FINISH;
 		P_NATIVE_BEGIN;
-		P_THIS->Flocking(Z_Param_Out_neighbours);
+		P_THIS->Flocking(Z_Param_Out_neighbours,Z_Param_length);
 		P_NATIVE_END;
 	}
 	DEFINE_FUNCTION(AEnemyController::execAddForceDirection)
@@ -87,12 +88,14 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		struct EnemyController_eventFlocking_Parms
 		{
 			TArray<AActor*> neighbours;
+			int32 length;
 		};
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_neighbours_Inner;
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_neighbours_MetaData[];
 #endif
 		static const UECodeGen_Private::FArrayPropertyParams NewProp_neighbours;
+		static const UECodeGen_Private::FUnsizedIntPropertyParams NewProp_length;
 		static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
@@ -106,9 +109,11 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	};
 #endif
 	const UECodeGen_Private::FArrayPropertyParams Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours = { "neighbours", nullptr, (EPropertyFlags)0x0010000008000182, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(EnemyController_eventFlocking_Parms, neighbours), EArrayPropertyFlags::None, METADATA_PARAMS(Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_MetaData, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_MetaData)) };
+	const UECodeGen_Private::FUnsizedIntPropertyParams Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_length = { "length", nullptr, (EPropertyFlags)0x0010000000000080, UECodeGen_Private::EPropertyGenFlags::Int, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(EnemyController_eventFlocking_Parms, length), METADATA_PARAMS(nullptr, 0) };
 	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_AEnemyController_Flocking_Statics::PropPointers[] = {
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours_Inner,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_neighbours,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_Flocking_Statics::NewProp_length,
 	};
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AEnemyController_Flocking_Statics::Function_MetaDataParams[] = {
@@ -170,7 +175,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_AEnemyController_Statics::FuncInfo[] = {
 		{ &Z_Construct_UFunction_AEnemyController_AddForceDirection, "AddForceDirection" }, // 751657149
-		{ &Z_Construct_UFunction_AEnemyController_Flocking, "Flocking" }, // 2940189943
+		{ &Z_Construct_UFunction_AEnemyController_Flocking, "Flocking" }, // 4292884816
 		{ &Z_Construct_UFunction_AEnemyController_InitController, "InitController" }, // 1259502489
 	};
 #if WITH_METADATA
@@ -213,15 +218,15 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	AEnemyController::AEnemyController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AEnemyController);
 	AEnemyController::~AEnemyController() {}
-	struct Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics
+	struct Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 2113224321U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 3271611834U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_3634439289(TEXT("/Script/ThirdPersonV2"),
-		Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_michael_kirkpatrick_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_3262429125(TEXT("/Script/ThirdPersonV2"),
+		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

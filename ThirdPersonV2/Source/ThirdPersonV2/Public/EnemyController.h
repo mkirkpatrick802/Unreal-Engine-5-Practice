@@ -9,14 +9,6 @@
 #include "AIController.h"
 #include "EnemyController.generated.h"
 
-struct ForceConstants
-{
-
-public:
-	const float _wanderingConstant = 1000;
-	const float _separationConstant = 1000;
-};
-
 UCLASS()
 class THIRDPERSONV2_API AEnemyController : public AAIController
 {
@@ -30,21 +22,30 @@ public:
 		void AddForceDirection(FVector directionToBeAdded);
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Movement|")
-		void Flocking(const TArray<AActor*>& neighbours);
+		void Flocking(const TArray<AActor*>& neighbours, int length);
 
 	//Flocking Calculations
-	void CalculateSeperationDirection(const TArray<AActor*>& neighbours);
-	void CalculateCohesionDirection(const TArray<AActor*>& neighbours);
-	void CalculateAlignmentDirection(const TArray<AActor*>& neighbours);
+	void CalculateSeperationDirection(const TArray<AActor*>& neighbours, int length);
+	void CalculateCohesionDirection(const TArray<AActor*>& neighbours, int length);
+	void CalculateAlignmentDirection(const TArray<AActor*>& neighbours, int length);
 
 	void SetCurrentForceDirection(FVector dir) { _currentForceDirection = dir; }
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
+
+	const float separationConstant = 1000;
+	const float wanderingConstant = 1000;
+	const float cohesionConstant = 1000;
+	const float alignmentConstant = 1000;
+
+	FVector separationDirection;
+	FVector cohesionDirection;
+	FVector alignmentDirection;
 
 private:
 
 	//Constants
 	const float _dampingConstant = .2;
 
-	FVector _currentForceDirection;
 
+	FVector _currentForceDirection;
 };
