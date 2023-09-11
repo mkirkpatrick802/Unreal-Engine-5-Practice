@@ -50,4 +50,6 @@ private:
 	AEnemyController* _controller;
 	const float _wanderingConstant = 1000;
 
+	bool _atBorder = false;
+
 };

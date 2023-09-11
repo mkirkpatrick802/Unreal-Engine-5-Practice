@@ -38,12 +38,7 @@ void AEnemyCharacter::Move()
 	if(!IsCharacterLeavingNavmesh())
 	{
 		dir.X *= -1;
-
-		double x = dir.X;
-		double y = dir.Y;
-
-		dir.Y = x;
-		dir.X = y;
+		dir.Y *= -1;
 	}
 
 	AddMovementInput(dir, _wanderingConstant, true);

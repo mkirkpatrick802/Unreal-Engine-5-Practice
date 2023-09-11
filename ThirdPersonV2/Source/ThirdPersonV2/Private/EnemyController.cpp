@@ -13,5 +13,20 @@ void AEnemyController::AddForceDirection(FVector directionToBeAdded)
 
 void AEnemyController::Flocking(const TArray<AActor*>& neighbours)
 {
-	SetCurrentForceDirection(FVector(0, 0, 0));
+
+}
+
+void AEnemyController::CalculateSeperationDirection(const TArray<AActor*>& neighbours)
+{
+
+}
+
+void AEnemyController::CalculateCohesionDirection(const TArray<AActor*>& neighbours)
+{
+
+}
+
+void AEnemyController::CalculateAlignmentDirection(const TArray<AActor*>& neighbours)
+{
+
 }
