@@ -33,8 +33,8 @@ public:
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
 
 	const float wanderingConstant = 1000;
-	const float separationConstant = 700;
-	const float cohesionConstant = 625;
+	const float separationConstant = 2000;
+	const float cohesionConstant = 700;
 	const float alignmentConstant = 50;
 
 	FVector separationDirection;
