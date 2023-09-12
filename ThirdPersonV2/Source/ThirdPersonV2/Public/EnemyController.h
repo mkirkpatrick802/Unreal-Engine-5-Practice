@@ -9,6 +9,15 @@
 #include "AIController.h"
 #include "EnemyController.generated.h"
 
+UENUM(BlueprintType)
+enum EConstantTypes
+{
+	Wandering		UMETA(DisplayName = "Wandering"),
+	Seperation		UMETA(DisplayName = "Seperation"),
+	Cohesion		UMETA(DisplayName = "Cohesion"),
+	Alignment		UMETA(DisplayName = "Alignment"),
+};
+
 UCLASS()
 class THIRDPERSONV2_API AEnemyController : public AAIController
 {
@@ -32,10 +41,13 @@ public:
 	void SetCurrentForceDirection(FVector dir) { _currentForceDirection = dir; }
 	FVector GetCurrentForceDirection() const { return _currentForceDirection; }
 
-	const float wanderingConstant = 1000;
-	const float separationConstant = 2000;
-	const float cohesionConstant = 700;
-	const float alignmentConstant = 50;
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Utility|")
+		static void SetConstant(EConstantTypes type, float value);
+
+	inline static float wanderingConstant = 0;
+	inline static float separationConstant = 0;
+	inline static float cohesionConstant = 0;
+	inline static float alignmentConstant = 0;
 
 	FVector separationDirection;
 	FVector cohesionDirection;
