@@ -14,8 +14,79 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	ENGINE_API UClass* Z_Construct_UClass_AActor_NoRegister();
 	THIRDPERSONV2_API UClass* Z_Construct_UClass_AEnemyController();
 	THIRDPERSONV2_API UClass* Z_Construct_UClass_AEnemyController_NoRegister();
+	THIRDPERSONV2_API UEnum* Z_Construct_UEnum_ThirdPersonV2_EConstantTypes();
 	UPackage* Z_Construct_UPackage__Script_ThirdPersonV2();
 // End Cross Module References
+	static FEnumRegistrationInfo Z_Registration_Info_UEnum_EConstantTypes;
+	static UEnum* EConstantTypes_StaticEnum()
+	{
+		if (!Z_Registration_Info_UEnum_EConstantTypes.OuterSingleton)
+		{
+			Z_Registration_Info_UEnum_EConstantTypes.OuterSingleton = GetStaticEnum(Z_Construct_UEnum_ThirdPersonV2_EConstantTypes, (UObject*)Z_Construct_UPackage__Script_ThirdPersonV2(), TEXT("EConstantTypes"));
+		}
+		return Z_Registration_Info_UEnum_EConstantTypes.OuterSingleton;
+	}
+	template<> THIRDPERSONV2_API UEnum* StaticEnum<EConstantTypes>()
+	{
+		return EConstantTypes_StaticEnum();
+	}
+	struct Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics
+	{
+		static const UECodeGen_Private::FEnumeratorParam Enumerators[];
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam Enum_MetaDataParams[];
+#endif
+		static const UECodeGen_Private::FEnumParams EnumParams;
+	};
+	const UECodeGen_Private::FEnumeratorParam Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enumerators[] = {
+		{ "Wandering", (int64)Wandering },
+		{ "Seperation", (int64)Seperation },
+		{ "Cohesion", (int64)Cohesion },
+		{ "Alignment", (int64)Alignment },
+	};
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enum_MetaDataParams[] = {
+		{ "Alignment.DisplayName", "Alignment" },
+		{ "Alignment.Name", "Alignment" },
+		{ "BlueprintType", "true" },
+		{ "Cohesion.DisplayName", "Cohesion" },
+		{ "Cohesion.Name", "Cohesion" },
+		{ "ModuleRelativePath", "Public/EnemyController.h" },
+		{ "Seperation.DisplayName", "Seperation" },
+		{ "Seperation.Name", "Seperation" },
+		{ "Wandering.DisplayName", "Wandering" },
+		{ "Wandering.Name", "Wandering" },
+	};
+#endif
+	const UECodeGen_Private::FEnumParams Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::EnumParams = {
+		(UObject*(*)())Z_Construct_UPackage__Script_ThirdPersonV2,
+		nullptr,
+		"EConstantTypes",
+		"EConstantTypes",
+		Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enumerators,
+		UE_ARRAY_COUNT(Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enumerators),
+		RF_Public|RF_Transient|RF_MarkAsNative,
+		EEnumFlags::None,
+		(uint8)UEnum::ECppForm::Regular,
+		METADATA_PARAMS(Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enum_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::Enum_MetaDataParams))
+	};
+	UEnum* Z_Construct_UEnum_ThirdPersonV2_EConstantTypes()
+	{
+		if (!Z_Registration_Info_UEnum_EConstantTypes.InnerSingleton)
+		{
+			UECodeGen_Private::ConstructUEnum(Z_Registration_Info_UEnum_EConstantTypes.InnerSingleton, Z_Construct_UEnum_ThirdPersonV2_EConstantTypes_Statics::EnumParams);
+		}
+		return Z_Registration_Info_UEnum_EConstantTypes.InnerSingleton;
+	}
+	DEFINE_FUNCTION(AEnemyController::execSetConstant)
+	{
+		P_GET_PROPERTY(FByteProperty,Z_Param_type);
+		P_GET_PROPERTY(FFloatProperty,Z_Param_value);
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		AEnemyController::SetConstant(EConstantTypes(Z_Param_type),Z_Param_value);
+		P_NATIVE_END;
+	}
 	DEFINE_FUNCTION(AEnemyController::execFlocking)
 	{
 		P_GET_TARRAY_REF(AActor*,Z_Param_Out_c_neighbours);
@@ -49,6 +120,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 			{ "AddForceDirection", &AEnemyController::execAddForceDirection },
 			{ "Flocking", &AEnemyController::execFlocking },
 			{ "InitController", &AEnemyController::execInitController },
+			{ "SetConstant", &AEnemyController::execSetConstant },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, UE_ARRAY_COUNT(Funcs));
 	}
@@ -175,6 +247,43 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		}
 		return ReturnFunction;
 	}
+	struct Z_Construct_UFunction_AEnemyController_SetConstant_Statics
+	{
+		struct EnemyController_eventSetConstant_Parms
+		{
+			TEnumAsByte<EConstantTypes> type;
+			float value;
+		};
+		static const UECodeGen_Private::FBytePropertyParams NewProp_type;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_value;
+		static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UECodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UECodeGen_Private::FBytePropertyParams Z_Construct_UFunction_AEnemyController_SetConstant_Statics::NewProp_type = { "type", nullptr, (EPropertyFlags)0x0010000000000080, UECodeGen_Private::EPropertyGenFlags::Byte, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(EnemyController_eventSetConstant_Parms, type), Z_Construct_UEnum_ThirdPersonV2_EConstantTypes, METADATA_PARAMS(nullptr, 0) }; // 3117771293
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_AEnemyController_SetConstant_Statics::NewProp_value = { "value", nullptr, (EPropertyFlags)0x0010000000000080, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, nullptr, nullptr, STRUCT_OFFSET(EnemyController_eventSetConstant_Parms, value), METADATA_PARAMS(nullptr, 0) };
+	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_AEnemyController_SetConstant_Statics::PropPointers[] = {
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_SetConstant_Statics::NewProp_type,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AEnemyController_SetConstant_Statics::NewProp_value,
+	};
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AEnemyController_SetConstant_Statics::Function_MetaDataParams[] = {
+		{ "Category", "Enemy|Utility|" },
+		{ "ModuleRelativePath", "Public/EnemyController.h" },
+	};
+#endif
+	const UECodeGen_Private::FFunctionParams Z_Construct_UFunction_AEnemyController_SetConstant_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_AEnemyController, nullptr, "SetConstant", nullptr, nullptr, sizeof(Z_Construct_UFunction_AEnemyController_SetConstant_Statics::EnemyController_eventSetConstant_Parms), Z_Construct_UFunction_AEnemyController_SetConstant_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_SetConstant_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x04022401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_AEnemyController_SetConstant_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_AEnemyController_SetConstant_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_AEnemyController_SetConstant()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UECodeGen_Private::ConstructUFunction(&ReturnFunction, Z_Construct_UFunction_AEnemyController_SetConstant_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
 	IMPLEMENT_CLASS_NO_AUTO_REGISTRATION(AEnemyController);
 	UClass* Z_Construct_UClass_AEnemyController_NoRegister()
 	{
@@ -198,6 +307,7 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 		{ &Z_Construct_UFunction_AEnemyController_AddForceDirection, "AddForceDirection" }, // 751657149
 		{ &Z_Construct_UFunction_AEnemyController_Flocking, "Flocking" }, // 3031567528
 		{ &Z_Construct_UFunction_AEnemyController_InitController, "InitController" }, // 1259502489
+		{ &Z_Construct_UFunction_AEnemyController_SetConstant, "SetConstant" }, // 3610179448
 	};
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AEnemyController_Statics::Class_MetaDataParams[] = {
@@ -241,13 +351,17 @@ void EmptyLinkFunctionForGeneratedCodeEnemyController() {}
 	AEnemyController::~AEnemyController() {}
 	struct Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics
 	{
+		static const FEnumRegisterCompiledInInfo EnumInfo[];
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 3791478971U) },
+	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::EnumInfo[] = {
+		{ EConstantTypes_StaticEnum, TEXT("EConstantTypes"), &Z_Registration_Info_UEnum_EConstantTypes, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 3117771293U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_30736023(TEXT("/Script/ThirdPersonV2"),
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_AEnemyController, AEnemyController::StaticClass, TEXT("AEnemyController"), &Z_Registration_Info_UClass_AEnemyController, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AEnemyController), 471692024U) },
+	};
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_1848092550(TEXT("/Script/ThirdPersonV2"),
 		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::ClassInfo),
 		nullptr, 0,
-		nullptr, 0);
+		Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Michael_Documents_Unreal_Projects_Unreal_Engine_5_Practice_ThirdPersonV2_Source_ThirdPersonV2_Public_EnemyController_h_Statics::EnumInfo));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
