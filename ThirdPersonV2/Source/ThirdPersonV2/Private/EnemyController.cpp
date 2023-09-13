@@ -15,9 +15,18 @@ void AEnemyController::AddForceDirection(FVector directionToBeAdded)
 
 void AEnemyController::Flocking(const TArray<AActor*>& c_neighbours, int c_length, const TArray<AActor*>& s_neighbours, int s_length)
 {
-	CalculateCohesionDirection(c_neighbours, c_length);
-	CalculateAlignmentDirection(c_neighbours, c_length);
-	CalculateSeperationDirection(s_neighbours, s_length);
+    cohesionDirection = FVector(0, 0, 0);
+    alignmentDirection = FVector(0, 0, 0);
+    separationDirection = FVector(0, 0, 0);
+
+    if(cohesionConstant != 0)
+		CalculateCohesionDirection(c_neighbours, c_length);
+
+    if (alignmentConstant != 0)
+		CalculateAlignmentDirection(c_neighbours, c_length);
+
+    if (separationConstant != 0)
+		CalculateSeperationDirection(s_neighbours, s_length);
 }
 
 void AEnemyController::CalculateSeperationDirection(const TArray<AActor*>& neighbours, int length)
@@ -28,7 +37,11 @@ void AEnemyController::CalculateSeperationDirection(const TArray<AActor*>& neigh
         force += this->GetPawn()->GetActorLocation() - neighbours[i]->GetActorLocation();
     }
 
-    //Gotta Clamp
+    if(!force.Normalize())
+    {
+        force *= 100;
+    }
+
     separationDirection = force.GetSafeNormal();
 }
 
