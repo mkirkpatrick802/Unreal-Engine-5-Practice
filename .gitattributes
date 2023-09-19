@@ -13,6 +13,10 @@
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.xcf filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8db48c031b0237200473118fde5bb208572b34ac
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.log filter=lfs diff=lfs merge=lfs -text
 *.ini filter=lfs diff=lfs merge=lfs -text
@@ -23,6 +27,7 @@
 *.filters filter=lfs diff=lfs merge=lfs -text
 *.runtime-xml filter=lfs diff=lfs merge=lfs -text
 *.dmp filter=lfs diff=lfs merge=lfs -text
+<<<<<<< HEAD
 /Practice/Content/Characters/Mannequin_UE4/Animations/Jog_Fwd.uasset filter=lfs diff=lfs merge=lfs -text
 /Practice/Content/Characters/Mannequin_UE4/Meshes/SK_Mannequin.uasset filter=lfs diff=lfs merge=lfs -text
 /Practice/Content/Characters/Mannequin_UE4/Textures/T_ML_Aluminum01.uasset filter=lfs diff=lfs merge=lfs -text
@@ -546,3 +551,6 @@
 /MP_Plugin/Saved/StagedBuilds/Windows/MP_Plugin/Content/Paks/MP_Plugin-Windows.utoc filter=lfs diff=lfs merge=lfs -text
 /MP_Plugin/Saved/StagedBuilds/Windows/MP_Plugin/Content/Paks/global.ucas filter=lfs diff=lfs merge=lfs -text
 /MP_Plugin/Saved/StagedBuilds/Windows/Manifest_UFSFiles_Win64.txt filter=lfs diff=lfs merge=lfs -text
+=======
+
+>>>>>>> 8db48c031b0237200473118fde5bb208572b34ac
