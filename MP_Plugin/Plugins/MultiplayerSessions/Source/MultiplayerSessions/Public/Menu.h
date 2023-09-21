@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "Menu.generated.h"
 
 /**
@@ -17,12 +18,24 @@ class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup(int32 NumberOfPublicConnection = 4, FString TypeOfMatch = FString(TEXT("TeamBattle")));
+	void MenuSetup(int32 NumberOfPublicConnection = 4, FString TypeOfMatch = FString(TEXT("TeamBattle")), FString LobbyPath = FString(TEXT("/Game/ThirdPerson/Maps/Lobby")));
 
 protected:
 
 	virtual bool Initialize() override;
 	virtual void NativeDestruct() override;
+
+	//
+	// Callbacks for custom delegates on the MultiplayerSessionSubsystem
+	//
+	UFUNCTION()
+	void OnCreateSession(bool bWasSuccessful);
+	void OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful);
+	void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
+	UFUNCTION()
+	void OnDestroySession(bool bWasSuccessful);
+	UFUNCTION()
+	void OnStartSession(bool bWasSuccessful);
 
 private:
 
@@ -45,4 +58,5 @@ private:
 
 	int32 NumPublicConnections{4};
 	FString MatchType{TEXT("TeamBattle")};
+	FString PathToLobby{ TEXT("") };
 };
