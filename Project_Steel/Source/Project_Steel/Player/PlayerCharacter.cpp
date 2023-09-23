@@ -8,6 +8,8 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -22,6 +24,12 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Follow Camera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	CharacterMovement = GetCharacterMovement();
+	CharacterMovement->bOrientRotationToMovement = false;
+
+	OverHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverHeadWidget->SetupAttachment(RootComponent);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -39,33 +47,57 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
+void APlayerCharacter::ServerRPCRotate_Implementation()
+{
+
+	if(CharacterMovement)
+	{
+		CharacterMovement->bOrientRotationToMovement = false;
+	}
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		
+		FVector MouseWorldLocation;
+		FVector MouseWorldDirection;
+		if (PlayerController->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection))
+		{
+			FRotator Rotator = MouseWorldDirection.Rotation();
+			Rotator = FMath::Lerp(PlayerController->GetPawn()->GetActorRotation(), Rotator, .1f);
+			Rotator.Pitch = 0;
+			Rotator.Roll = 0;
+			SetActorRotation(Rotator);
+		}
+	}
+}
+
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
+	IsMoving = true;
+
+	if (CharacterMovement)
+	{
+		CharacterMovement->bOrientRotationToMovement = true;
+	}
+
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
-	const FVector Forward = GetActorForwardVector();
-	AddMovementInput(Forward, MovementVector.Y);
+	AddMovementInput(FVector(0.f, 1.f, 0.f), MovementVector.Y);
 
 	const FVector Right = GetActorRightVector();
-	AddMovementInput(Right, MovementVector.X);
+	AddMovementInput(FVector(1.f, 0.f, 0.f), MovementVector.X);
+}
+
+void APlayerCharacter::StopMoving(const FInputActionValue& Value)
+{
+	IsMoving = false;
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		FVector MouseWorldLocation;
-		FVector MouseWorldDirection;
-		if(PlayerController->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection))
-		{
-			FRotator Rotator = MouseWorldDirection.Rotation();
-			Rotator.Pitch = 0;
-			Rotator.Roll = 0;
-			SetActorRotation(Rotator);
-		}
-	}
+	if (!IsMoving) ServerRPCRotate();
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -75,6 +107,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopMoving);
 	}
 }
 

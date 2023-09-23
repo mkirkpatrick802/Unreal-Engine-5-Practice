@@ -28,7 +28,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* MoveAction;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerRPCRotate();
+
 	void Move(const FInputActionValue& Value);
+	void StopMoving(const FInputActionValue& Value);
 
 private:
 
@@ -38,8 +42,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
 
-public:
+	class UCharacterMovementComponent* CharacterMovement;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverHeadWidget;
 
+	bool IsMoving = false;
 
 };
