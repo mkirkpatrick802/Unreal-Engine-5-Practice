@@ -17,6 +17,7 @@ public:
 	APlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 
@@ -28,10 +29,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* MoveAction;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void ServerRPCRotate();
+
+private:
+
+	FRotator RotateToMouse();
+
+	void Rotate();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRotate(bool IsMoving, FRotator Rotator = FRotator(0, 0, 0));
 
 	void Move(const FInputActionValue& Value);
+
 	void StopMoving(const FInputActionValue& Value);
 
 private:
@@ -42,11 +51,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
 
-	class UCharacterMovementComponent* CharacterMovement;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverHeadWidget;
 
-	bool IsMoving = false;
+	UPROPERTY(Replicated)
+	bool IsCurrentlyMoving = false;
 
 };

@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -25,11 +26,35 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	CharacterMovement = GetCharacterMovement();
-	CharacterMovement->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	OverHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverHeadWidget->SetupAttachment(RootComponent);
+}
+
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!IsCurrentlyMoving) Rotate();
+}
+
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopMoving);
+	}
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, IsCurrentlyMoving);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -47,17 +72,10 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
-void APlayerCharacter::ServerRPCRotate_Implementation()
+FRotator APlayerCharacter::RotateToMouse()
 {
-
-	if(CharacterMovement)
-	{
-		CharacterMovement->bOrientRotationToMovement = false;
-	}
-
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		
 		FVector MouseWorldLocation;
 		FVector MouseWorldDirection;
 		if (PlayerController->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection))
@@ -67,47 +85,63 @@ void APlayerCharacter::ServerRPCRotate_Implementation()
 			Rotator.Pitch = 0;
 			Rotator.Roll = 0;
 			SetActorRotation(Rotator);
+
+			return Rotator;
 		}
+	}
+
+	return FRotator(0, 0, 0);
+}
+
+void APlayerCharacter::Rotate()
+{
+	if(HasAuthority())
+	{
+		RotateToMouse();
+	}
+	else
+	{
+		ServerRotate(false, RotateToMouse());
+	}
+}
+
+void APlayerCharacter::ServerRotate_Implementation(bool IsMoving, FRotator Rotator)
+{
+	IsCurrentlyMoving = IsMoving;
+
+	if(IsCurrentlyMoving)
+	{
+		if(UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			MovementComponent->bOrientRotationToMovement = true;
+		}
+	}
+	else
+	{
+		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			MovementComponent->bOrientRotationToMovement = false;
+		}
+
+		SetActorRotation(Rotator);
 	}
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
-	IsMoving = true;
-
-	if (CharacterMovement)
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
-		CharacterMovement->bOrientRotationToMovement = true;
+		MovementComponent->bOrientRotationToMovement = true;
 	}
 
+	ServerRotate(true);
+
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-
 	AddMovementInput(FVector(0.f, 1.f, 0.f), MovementVector.Y);
-
-	const FVector Right = GetActorRightVector();
 	AddMovementInput(FVector(1.f, 0.f, 0.f), MovementVector.X);
 }
 
 void APlayerCharacter::StopMoving(const FInputActionValue& Value)
 {
-	IsMoving = false;
+	ServerRotate(false);
 }
-
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (!IsMoving) ServerRPCRotate();
-}
-
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopMoving);
-	}
-}
-
