@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ImathEuler.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -32,11 +33,12 @@ APlayerCharacter::APlayerCharacter()
 	OverHeadWidget->SetupAttachment(RootComponent);
 }
 
-void APlayerCharacter::Tick(float DeltaTime)
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::Tick(DeltaTime);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	if (!IsCurrentlyMoving) Rotate();
+	DOREPLIFETIME(APlayerCharacter, IsCurrentlyMoving);
+	DOREPLIFETIME(APlayerCharacter, IsFlying);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -45,16 +47,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopMoving);
+
+		//Flying
+		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Started, this, &APlayerCharacter::FlyingDelta);
+		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Canceled, this, &APlayerCharacter::FlyingDelta);
+		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Completed, this, &APlayerCharacter::FlyingDelta);
 	}
-}
-
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(APlayerCharacter, IsCurrentlyMoving);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -72,6 +73,20 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!IsCurrentlyMoving) Rotate();
+	//if (!IsFlying) StopFlying();
+}
+
+/*
+ *
+ *	Player Rotations
+ *
+ */
+
 FRotator APlayerCharacter::RotateToMouse()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -81,7 +96,7 @@ FRotator APlayerCharacter::RotateToMouse()
 		if (PlayerController->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection))
 		{
 			FRotator Rotator = MouseWorldDirection.Rotation();
-			Rotator = FMath::Lerp(PlayerController->GetPawn()->GetActorRotation(), Rotator, .1f);
+			Rotator = FMath::Lerp(GetActorRotation(), Rotator, .05f);
 			Rotator.Pitch = 0;
 			Rotator.Roll = 0;
 			SetActorRotation(Rotator);
@@ -127,6 +142,12 @@ void APlayerCharacter::ServerRotate_Implementation(bool IsMoving, FRotator Rotat
 	}
 }
 
+/*
+ *
+ *	Player Movement
+ *
+ */
+
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
 	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
@@ -134,7 +155,7 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		MovementComponent->bOrientRotationToMovement = true;
 	}
 
-	ServerRotate(true);
+	ServerRotate(true, GetActorRotation());
 
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	AddMovementInput(FVector(0.f, 1.f, 0.f), MovementVector.Y);
@@ -143,5 +164,79 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 void APlayerCharacter::StopMoving(const FInputActionValue& Value)
 {
-	ServerRotate(false);
+	ServerRotate(false, GetActorRotation());
+}
+
+/*
+ *
+ *	Player Flying
+ *
+ */
+
+/*void APlayerCharacter::StopFlying()
+{
+	if(UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		if(MovementComponent->MovementMode == MOVE_Walking) return;
+
+		FFindFloorResult* FloorResult = nullptr;
+		MovementComponent->FindFloor(GetActorLocation(), *FloorResult, true);
+		if(FloorResult != nullptr)
+		{
+			if (!FloorResult->HitResult.IsValidBlockingHit()) return;
+
+			switch (MovementComponent->MovementMode)
+			{
+			case MOVE_Falling:
+			case MOVE_Flying:
+				MovementComponent->SetMovementMode(MOVE_Walking);
+				ServerSetFlying(false, true);
+				break;
+			default: 
+				return;
+			}
+		}
+	}
+}*/
+
+void APlayerCharacter::FlyingDelta(const FInputActionValue& Value)
+{
+	ServerSetFlying(Value.Get<bool>());
+}
+
+void APlayerCharacter::ServerSetFlying_Implementation(bool Value, bool Timer)
+{
+	IsFlying = Value;
+
+	if(!Timer)
+	{
+		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			MovementComponent->bCanWalkOffLedges = Value;
+		}
+	}
+	else
+	{
+		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			MovementComponent->bCanWalkOffLedges = !Value;
+		}
+
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &APlayerCharacter::LandingTimerBuffer, Value);
+		GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, .1f, false);
+	}
+}
+
+void APlayerCharacter::LandingTimerBuffer(bool Value)
+{
+	ServerLandingTimer(Value);
+}
+
+void APlayerCharacter::ServerLandingTimer_Implementation(bool Value)
+{
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->bCanWalkOffLedges = Value;
+	}
 }

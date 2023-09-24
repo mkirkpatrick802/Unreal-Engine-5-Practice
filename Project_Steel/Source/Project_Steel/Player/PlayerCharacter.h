@@ -29,19 +29,30 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* FlyAction;
 
 private:
-
+	void Rotate();
 	FRotator RotateToMouse();
 
-	void Rotate();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRotate(bool IsMoving, FRotator Rotator = FRotator(0, 0, 0));
+	UFUNCTION(Server, Unreliable)
+	void ServerRotate(bool IsMoving, FRotator Rotator);
 
 	void Move(const FInputActionValue& Value);
-
 	void StopMoving(const FInputActionValue& Value);
+
+	//void StopFlying();
+	void FlyingDelta(const FInputActionValue& Value);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetFlying(bool Value, bool Timer = false);
+
+	void LandingTimerBuffer(bool Value);
+
+	UFUNCTION(Server, Reliable)
+	void ServerLandingTimer(bool Value);
+
 
 private:
 
@@ -56,5 +67,8 @@ private:
 
 	UPROPERTY(Replicated)
 	bool IsCurrentlyMoving = false;
+
+	UPROPERTY(Replicated)
+	bool IsFlying = false;
 
 };
