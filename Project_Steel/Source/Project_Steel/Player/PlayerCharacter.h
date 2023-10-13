@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -42,7 +40,7 @@ private:
 	void Move(const FInputActionValue& Value);
 	void StopMoving(const FInputActionValue& Value);
 
-	//void StopFlying();
+	void StopFlying();
 	void FlyingDelta(const FInputActionValue& Value);
 
 	UFUNCTION(Server, Reliable)
@@ -62,6 +60,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, Category = Movement)
+	class USphereComponent* GroundCheck;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverHeadWidget;
 
@@ -70,5 +71,4 @@ private:
 
 	UPROPERTY(Replicated)
 	bool IsFlying = false;
-
 };

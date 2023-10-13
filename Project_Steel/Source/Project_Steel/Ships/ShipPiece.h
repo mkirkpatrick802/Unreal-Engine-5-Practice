@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
 #include "ShipPiece.generated.h"
 
@@ -22,5 +23,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	bool HasTag(FName Tag);
+
+public:
+
+	UPROPERTY()
+	FGameplayTagContainer ShipTags;
 
 };

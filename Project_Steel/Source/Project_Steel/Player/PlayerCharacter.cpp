@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
@@ -9,9 +6,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ImathEuler.h"
+#include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Project_Steel/Ships/ShipPiece.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -31,6 +30,10 @@ APlayerCharacter::APlayerCharacter()
 
 	OverHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverHeadWidget->SetupAttachment(RootComponent);
+
+	GroundCheck = CreateDefaultSubobject<USphereComponent>(TEXT("Ground Check"));
+	GroundCheck->SetupAttachment(GetMesh());
+	GroundCheck->InitSphereRadius(10);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -62,6 +65,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Map Inputs
 	if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -71,6 +75,12 @@ void APlayerCharacter::BeginPlay()
 
 		PlayerController->SetShowMouseCursor(true);
 	}
+
+	//Start Ground Check Timer
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &APlayerCharacter::StopFlying);
+	float GroundCheckTimeInterval = .25f;
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, GroundCheckTimeInterval, true);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -78,7 +88,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (!IsCurrentlyMoving) Rotate();
-	//if (!IsFlying) StopFlying();
 }
 
 /*
@@ -173,31 +182,47 @@ void APlayerCharacter::StopMoving(const FInputActionValue& Value)
  *
  */
 
-/*void APlayerCharacter::StopFlying()
+void APlayerCharacter::StopFlying()
 {
+
 	if(UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
 		if(MovementComponent->MovementMode == MOVE_Walking) return;
-
-		FFindFloorResult* FloorResult = nullptr;
-		MovementComponent->FindFloor(GetActorLocation(), *FloorResult, true);
-		if(FloorResult != nullptr)
+		if(GroundCheck)
 		{
-			if (!FloorResult->HitResult.IsValidBlockingHit()) return;
 
-			switch (MovementComponent->MovementMode)
+			//Create Query Object to pass into collision function
+			FCollisionQueryParams TraceParams(FName(TEXT("GroundCheck")), true, this);
+
+			//Peform a sphere sweep
+			TArray<FHitResult> HitResults;
+			FVector SphereCenter = GroundCheck->GetComponentLocation();
+			float SphereRadius = GroundCheck->GetScaledSphereRadius();
+
+			FCollisionObjectQueryParams ObjectParams;
+			ObjectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+			if(GetWorld()->SweepMultiByObjectType(HitResults, SphereCenter, SphereCenter, FQuat::Identity, ObjectParams, FCollisionShape::MakeSphere(SphereRadius), TraceParams))
 			{
-			case MOVE_Falling:
-			case MOVE_Flying:
-				MovementComponent->SetMovementMode(MOVE_Walking);
-				ServerSetFlying(false, true);
-				break;
-			default: 
-				return;
+				for (const FHitResult& Hit : HitResults)
+				{
+					AActor* HitActor = Hit.GetActor();
+					if (HitActor->IsA(AShipPiece::StaticClass()))
+					{
+						switch (MovementComponent->MovementMode)
+						{
+						case MOVE_Falling:
+						case MOVE_Flying:
+							MovementComponent->SetMovementMode(MOVE_Walking);
+							ServerSetFlying(false, true);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
-}*/
+}
 
 void APlayerCharacter::FlyingDelta(const FInputActionValue& Value)
 {
