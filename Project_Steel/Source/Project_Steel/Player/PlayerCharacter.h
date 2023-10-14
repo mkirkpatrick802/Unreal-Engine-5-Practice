@@ -54,10 +54,16 @@ private:
 
 private:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector MouseWorldLocation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector MouseWorldDirection;
+
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Camera)
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, Category = Movement)

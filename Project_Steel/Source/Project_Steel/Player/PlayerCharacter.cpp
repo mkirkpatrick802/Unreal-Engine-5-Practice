@@ -87,7 +87,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!IsCurrentlyMoving) Rotate();
+	Rotate();
 }
 
 /*
@@ -100,17 +100,18 @@ FRotator APlayerCharacter::RotateToMouse()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		FVector MouseWorldLocation;
-		FVector MouseWorldDirection;
 		if (PlayerController->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection))
 		{
-			FRotator Rotator = MouseWorldDirection.Rotation();
-			Rotator = FMath::Lerp(GetActorRotation(), Rotator, .05f);
-			Rotator.Pitch = 0;
-			Rotator.Roll = 0;
-			SetActorRotation(Rotator);
+			if (!IsCurrentlyMoving)
+			{
+				FRotator Rotator = MouseWorldDirection.Rotation();
+				Rotator = FMath::Lerp(GetActorRotation(), Rotator, .05f);
+				Rotator.Pitch = 0;
+				Rotator.Roll = 0;
+				SetActorRotation(Rotator);
 
-			return Rotator;
+				return Rotator;
+			}
 		}
 	}
 
