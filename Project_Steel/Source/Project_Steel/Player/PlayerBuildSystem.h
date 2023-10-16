@@ -33,7 +33,7 @@ protected:
 	class UInputAction* ToggleBuildModeInput;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* PlaceInput;
+	class UInputAction* PlacePartInput;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* RotatePreviewInput;
@@ -51,11 +51,15 @@ private:
 
 	void ToggleBuildMode(const FInputActionValue& Value);
 	void PlacePart(const FInputActionValue& Value);
-	void RotatePreview(const FInputActionValue& Value);
+	void StartPreviewRotation(const FInputActionValue& Value);
+	void StopPreviewRotation(const FInputActionValue& Value);
 	void SelectPreview(const FInputActionValue& Value);
 
 	void PreviewLoop();
-	void ResetBuildMode();
+	void RotatePreview(float Value);
+
+	FTransform DetectSockets(AShipPiece* HitShipPiece, UPrimitiveComponent* HitComponent);
+	void ResetPreviewMesh();
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSpawn(FTransform SpawnTransform, UClass* ToSpawn);
@@ -63,6 +67,10 @@ private:
 private:
 
 	bool InBuildMode;
+	int ShipPartIndex;
+
+	UPROPERTY()
+	FTimerHandle RotationHandle;
 
 	UPROPERTY()
 	TArray<FShipParts> ShipPartsArray;
@@ -71,8 +79,14 @@ private:
 	APlayerCharacter* PlayerCharacter;
 
 	UPROPERTY()
-	UStaticMesh* PreviewMesh;
+	UStaticMeshComponent* PreviewMesh;
+
+	UPROPERTY(EditAnywhere, Category = Building)
+	UMaterial* PreviewMaterial;
 
 	UPROPERTY()
-	UStaticMeshComponent* StaticMeshComponent;
+	FTransform PreviewTransform;
+
+	UPROPERTY()
+	FRotator PreviewRotation;
 };
