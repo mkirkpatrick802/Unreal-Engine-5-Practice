@@ -24,6 +24,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputMappingContext* DefaultContext;
 
+	//Movement Inputs
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* MoveAction;
 
@@ -31,6 +32,7 @@ protected:
 	class UInputAction* FlyAction;
 
 private:
+
 	void Rotate();
 	FRotator RotateToMouse();
 
@@ -71,6 +73,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverHeadWidget;
+
+	UPROPERTY(VisibleAnywhere, Category = Building)
+	class UPlayerBuildSystem* PlayerBuildSystem;
 
 	UPROPERTY(Replicated)
 	bool IsCurrentlyMoving = false;

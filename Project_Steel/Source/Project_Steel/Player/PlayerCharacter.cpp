@@ -5,7 +5,7 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "ImathEuler.h"
+#include "PlayerBuildSystem.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -34,6 +34,8 @@ APlayerCharacter::APlayerCharacter()
 	GroundCheck = CreateDefaultSubobject<USphereComponent>(TEXT("Ground Check"));
 	GroundCheck->SetupAttachment(GetMesh());
 	GroundCheck->InitSphereRadius(10);
+
+	PlayerBuildSystem = CreateDefaultSubobject<UPlayerBuildSystem>(TEXT("Player Build System"));
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,6 +60,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Started, this, &APlayerCharacter::FlyingDelta);
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Canceled, this, &APlayerCharacter::FlyingDelta);
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Completed, this, &APlayerCharacter::FlyingDelta);
+
+		if(PlayerBuildSystem)
+		{
+			PlayerBuildSystem->SetUpInputs(EnhancedInputComponent);
+		}
 	}
 }
 
