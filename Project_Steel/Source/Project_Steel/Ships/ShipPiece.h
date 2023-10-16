@@ -4,8 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Actor.h"
 #include "ShipPiece.generated.h"
+
+USTRUCT(BlueprintType)
+struct FShipParts : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMesh* Mesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UClass* Blueprint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TEnumAsByte<ETraceTypeQuery> LayerTracChannel;
+};
 
 UCLASS()
 class PROJECT_STEEL_API AShipPiece : public AActor
