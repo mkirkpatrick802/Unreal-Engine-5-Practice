@@ -28,7 +28,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	//Building Inputs
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* ToggleBuildModeInput;
 
@@ -53,12 +52,13 @@ private:
 	void PlacePart(const FInputActionValue& Value);
 	void StartPreviewRotation(const FInputActionValue& Value);
 	void StopPreviewRotation(const FInputActionValue& Value);
-	void SelectPreview(const FInputActionValue& Value);
+	void CyclePreview(const FInputActionValue& Value);
 
 	void PreviewLoop();
 	void RotatePreview(float Value);
 
-	FTransform DetectSockets(AShipPiece* HitShipPiece, UPrimitiveComponent* HitComponent);
+	FTransform DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const;
+	bool CheckForOverlaps();
 	void ResetPreviewMesh();
 
 	UFUNCTION(Server, Unreliable)
@@ -68,6 +68,7 @@ private:
 
 	bool InBuildMode;
 	int ShipPartIndex;
+	bool PreviewBlocked;
 
 	UPROPERTY()
 	FTimerHandle RotationHandle;
@@ -82,7 +83,10 @@ private:
 	UStaticMeshComponent* PreviewMesh;
 
 	UPROPERTY(EditAnywhere, Category = Building)
-	UMaterial* PreviewMaterial;
+	UMaterial* CorrectPreviewMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Building)
+	UMaterial* WrongPreviewMaterial;
 
 	UPROPERTY()
 	FTransform PreviewTransform;

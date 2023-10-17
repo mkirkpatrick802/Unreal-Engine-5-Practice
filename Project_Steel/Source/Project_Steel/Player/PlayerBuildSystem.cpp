@@ -13,10 +13,14 @@ UPlayerBuildSystem::UPlayerBuildSystem()
 void UPlayerBuildSystem::SetUpInputs(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	EnhancedInputComponent->BindAction(ToggleBuildModeInput, ETriggerEvent::Started, this, &UPlayerBuildSystem::ToggleBuildMode);
+
 	EnhancedInputComponent->BindAction(PlacePartInput, ETriggerEvent::Started, this, &UPlayerBuildSystem::PlacePart);
+
 	EnhancedInputComponent->BindAction(RotatePreviewInput, ETriggerEvent::Started, this, &UPlayerBuildSystem::StartPreviewRotation);
 	EnhancedInputComponent->BindAction(RotatePreviewInput, ETriggerEvent::Completed, this, &UPlayerBuildSystem::StopPreviewRotation);
 	EnhancedInputComponent->BindAction(RotatePreviewInput, ETriggerEvent::Canceled, this, &UPlayerBuildSystem::StopPreviewRotation);
+
+	EnhancedInputComponent->BindAction(ScrollPartsInput, ETriggerEvent::Started, this, &UPlayerBuildSystem::CyclePreview);
 }
 
 void UPlayerBuildSystem::BeginPlay()
@@ -26,7 +30,7 @@ void UPlayerBuildSystem::BeginPlay()
 	PlayerCharacter = Cast<APlayerCharacter>(this->GetOwner());
 }
 
-void UPlayerBuildSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UPlayerBuildSystem::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -43,12 +47,11 @@ void UPlayerBuildSystem::ToggleBuildMode(const FInputActionValue& Value)
 	{
 		TMap<FName, uint8*> RowMap = ShipParts->GetRowMap();
 
-		for (auto& Element : RowMap)
+		for (const auto& Element : RowMap)
 		{
 			const FName RowName = Element.Key;
-			const FShipParts* Part = ShipParts->FindRow<FShipParts>(RowName, FString());
 
-			if (Part)
+			if (const FShipParts* Part = ShipParts->FindRow<FShipParts>(RowName, FString()))
 			{
 				ShipPartsArray.Add(*Part);
 			}
@@ -58,8 +61,8 @@ void UPlayerBuildSystem::ToggleBuildMode(const FInputActionValue& Value)
 	{
 		if (PreviewMesh)
 		{
+			PreviewMesh->DestroyComponent();
 			PreviewMesh = nullptr;
-			ResetPreviewMesh();
 		}
 	}
 }
@@ -67,6 +70,7 @@ void UPlayerBuildSystem::ToggleBuildMode(const FInputActionValue& Value)
 void UPlayerBuildSystem::PlacePart(const FInputActionValue& Value)
 {
 	if(!InBuildMode) return;
+	if(PreviewBlocked) return;
 
 	UClass* ActorClass = ShipPartsArray[ShipPartIndex].Blueprint;
 	ServerSpawn(PreviewTransform, ActorClass);
@@ -74,6 +78,8 @@ void UPlayerBuildSystem::PlacePart(const FInputActionValue& Value)
 
 void UPlayerBuildSystem::StartPreviewRotation(const FInputActionValue& Value)
 {
+	if (!InBuildMode) return;
+
 	if (RotationHandle.IsValid())
 	{
 		StartPreviewRotation(Value);
@@ -87,7 +93,24 @@ void UPlayerBuildSystem::StartPreviewRotation(const FInputActionValue& Value)
 
 void UPlayerBuildSystem::StopPreviewRotation(const FInputActionValue& Value)
 {
+	if (!InBuildMode) return;
+
 	PlayerCharacter->GetWorldTimerManager().ClearTimer(RotationHandle);
+}
+
+void UPlayerBuildSystem::CyclePreview(const FInputActionValue& Value)
+{
+	if(!InBuildMode) return;
+
+	ShipPartIndex += static_cast<int>(Value.Get<float>());
+	ShipPartIndex = FMath::Clamp(ShipPartIndex, 0, ShipPartsArray.Num() - 1);
+
+	if(PreviewMesh)
+	{
+		PreviewMesh->DestroyComponent();
+		PreviewMesh = nullptr;
+		ResetPreviewMesh();
+	}
 }
 
 void UPlayerBuildSystem::PreviewLoop()
@@ -108,7 +131,6 @@ void UPlayerBuildSystem::PreviewLoop()
 
 		if (HitActor->IsA(AShipPiece::StaticClass()))
 		{
-			//Hit a Ship Piece
 			AShipPiece* ShipPiece = Cast<AShipPiece>(HitActor);
 			PreviewTransform = DetectSockets(ShipPiece, HitResult.GetComponent());
 			PreviewMesh->SetWorldTransform(PreviewTransform);
@@ -117,23 +139,32 @@ void UPlayerBuildSystem::PreviewLoop()
 		{
 			FVector NewPosition = FVector(HitResult.Location.X, HitResult.Location.Y, -90);
 			PreviewTransform.SetLocation(NewPosition);
-			//PreviewTransform.SetRotation(PreviewRotation.Quaternion());
+			PreviewTransform.SetRotation(PreviewRotation.Quaternion());
 			PreviewMesh->SetWorldTransform(PreviewTransform);
+		}
+
+		if(CheckForOverlaps())
+		{
+			PreviewMesh->SetMaterial(0, WrongPreviewMaterial);
+		}
+		else
+		{
+			PreviewMesh->SetMaterial(0, CorrectPreviewMaterial);
 		}
 	}
 }
 
-void UPlayerBuildSystem::RotatePreview(float Value)
+void UPlayerBuildSystem::RotatePreview(const float Value)
 {
-	FRotator Change = FRotator(0, 0, 1.5f) * Value;
+	const FRotator Change = FRotator(0, 1.5f, 0) * Value;
 	PreviewRotation = Change + PreviewTransform.Rotator();
 }
 
-FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, UPrimitiveComponent* HitComponent)
+FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const
 {
-	IShipPieceInterface* Interface = Cast<IShipPieceInterface>(HitShipPiece);
+	const IShipPieceInterface* Interface = Cast<IShipPieceInterface>(HitShipPiece);
 	TArray<UBoxComponent*> Sockets = Interface->Execute_GetSockets(HitShipPiece);
-	for (auto Element : Sockets)
+	for (const auto Element : Sockets)
 	{
 		if(Element == HitComponent)
 		{
@@ -144,6 +175,18 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, UPrimitiv
 	return HitComponent->GetComponentTransform();
 }
 
+bool UPlayerBuildSystem::CheckForOverlaps()
+{
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+
+	const FBox BoundingBox = PreviewMesh->CalcBounds(PreviewTransform).GetBox();
+	DrawDebugBox(GetWorld(), BoundingBox.GetCenter(), BoundingBox.GetExtent() / 1.1f, FColor::White);
+	PreviewBlocked = GetWorld()->SweepSingleByObjectType(HitResult, BoundingBox.GetCenter(), BoundingBox.GetCenter(), FQuat(PreviewMesh->GetComponentRotation()), ECC_WorldDynamic, FCollisionShape::MakeBox(BoundingBox.GetExtent() / 1.1f), QueryParams);
+
+	return PreviewBlocked;
+}
+
 void UPlayerBuildSystem::ResetPreviewMesh()
 {
 	PreviewMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
@@ -151,15 +194,15 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 	{
 		PreviewMesh->AttachToComponent(PlayerCharacter->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		PreviewMesh->RegisterComponent();
-
+		PreviewMesh->SetMaterial(0, CorrectPreviewMaterial);
 		PreviewMesh->SetRelativeTransform(PreviewTransform);
 		PreviewMesh->SetStaticMesh(ShipPartsArray[ShipPartIndex].Mesh);
-		PreviewMesh->SetMaterial(0, PreviewMaterial);
 		PreviewMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PreviewMesh->SetGenerateOverlapEvents(true);
 	}
 }
 
-void UPlayerBuildSystem::ServerSpawn_Implementation(FTransform SpawnTransform, UClass* ToSpawn)
+void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransform, UClass* ToSpawn)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = nullptr;
