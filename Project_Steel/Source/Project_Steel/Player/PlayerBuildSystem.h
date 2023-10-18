@@ -7,6 +7,7 @@
 #include "PlayerBuildSystem.generated.h"
 
 
+class UInputAction;
 class UDataTable;
 class APlayerCharacter;
 struct FInputActionValue;
@@ -16,35 +17,15 @@ class PROJECT_STEEL_API UPlayerBuildSystem : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	UPlayerBuildSystem();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 public:
 
+	UPlayerBuildSystem();
 	void SetUpInputs(UEnhancedInputComponent* EnhancedInputComponent);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
 
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* ToggleBuildModeInput;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* PlacePartInput;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* RotatePreviewInput;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* ScrollPartsInput;
-
-
-protected:
-
-	UPROPERTY(EditAnywhere, Category = Building)
-	UDataTable* ShipParts;
 
 private:
 
@@ -58,32 +39,30 @@ private:
 	void RotatePreview(float Value);
 
 	FTransform DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const;
-
-	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	void ResetPreviewMesh();
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSpawn(FTransform SpawnTransform, UClass* ToSpawn);
 
+
+protected:
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* ToggleBuildModeInput;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* PlacePartInput;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* RotatePreviewInput;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* ScrollPartsInput;
+
+	UPROPERTY(EditAnywhere, Category = Building)
+	UDataTable* ShipParts;
+
 private:
-
-	bool InBuildMode;
-	int ShipPartIndex;
-	bool PreviewBlocked;
-
-	UPROPERTY()
-	FBox PreviewBoundingBox;
-
-	UPROPERTY()
-	FTimerHandle RotationHandle;
-
-	UPROPERTY()
-	TArray<FShipParts> ShipPartsArray;
 
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;
@@ -91,12 +70,26 @@ private:
 	UPROPERTY()
 	UStaticMeshComponent* PreviewMesh;
 
+	UPROPERTY()
+	TArray<FShipParts> ShipPartsArray;
+
+	UPROPERTY()
+	FTransform PreviewTransform;
+
+	UPROPERTY()
+	FTimerHandle RotationHandle;
+
+	UPROPERTY()
+	FRotator SocketRotation;
+
 	UPROPERTY(EditAnywhere, Category = Building)
 	UMaterial* CorrectPreviewMaterial;
 
 	UPROPERTY(EditAnywhere, Category = Building)
 	UMaterial* WrongPreviewMaterial;
 
-	UPROPERTY()
-	FTransform PreviewTransform;
+	bool InBuildMode;
+	int ShipPartIndex;
+	bool PreviewBlocked;
+	bool PreviewLockedInSocket;
 };

@@ -3,6 +3,8 @@
 
 #include "ShipPiece.h"
 
+#include "Ship.h"
+
 // Sets default values
 AShipPiece::AShipPiece()
 {
@@ -15,7 +17,22 @@ void AShipPiece::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShipTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Ship")));
+	if(!Ship)
+	{
+		Ship = GetWorld()->SpawnActor<AShip>(GetActorLocation(), GetActorRotation());
+		if(AttachToActor(Ship, FAttachmentTransformRules::SnapToTargetNotIncludingScale))
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.f,
+					FColor::Green,
+					FString::Printf(TEXT("Good"))
+				);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -23,9 +40,4 @@ void AShipPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-bool AShipPiece::HasTag(FName Tag)
-{
-	return ShipTags.HasTag(FGameplayTag::RequestGameplayTag(Tag));
 }

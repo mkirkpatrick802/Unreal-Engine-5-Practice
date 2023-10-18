@@ -8,6 +8,8 @@
 #include "GameFramework/Actor.h"
 #include "ShipPiece.generated.h"
 
+class AShip;
+
 USTRUCT(BlueprintType)
 struct FShipParts : public FTableRowBase
 {
@@ -34,21 +36,19 @@ class PROJECT_STEEL_API AShipPiece : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+
 	AShipPiece();
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	bool HasTag(FName Tag);
 
 public:
 
+	virtual void Tick(float DeltaTime) override;
+
+private:
+
 	UPROPERTY()
-	FGameplayTagContainer ShipTags;
+	AActor* Ship;
 };

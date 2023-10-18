@@ -91,8 +91,15 @@ void UPlayerBuildSystem::StartPreviewRotation(const FInputActionValue& Value)
 	}
 	else
 	{
-		const FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UPlayerBuildSystem::RotatePreview, Value.Get<float>());
-		PlayerCharacter->GetWorldTimerManager().SetTimer(RotationHandle, TimerDelegate, 0.01f, true);
+		if(PreviewLockedInSocket)
+		{
+			SocketRotation.Yaw += 90 * Value.Get<float>();
+		}
+		else
+		{
+			const FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UPlayerBuildSystem::RotatePreview, Value.Get<float>());
+			PlayerCharacter->GetWorldTimerManager().SetTimer(RotationHandle, TimerDelegate, 0.01f, true);
+		}
 	}
 }
 
@@ -136,11 +143,20 @@ void UPlayerBuildSystem::PreviewLoop()
 			ResetPreviewMesh();
 		}
 
+		TArray<AActor*> OverlappingActors;
+		PreviewMesh->GetOverlappingActors(OverlappingActors);
+		if (OverlappingActors.Num() < 1)
+			PreviewBlocked = false;
+		else
+			PreviewBlocked = true;
+
 		if (HitActor->IsA(AShipPiece::StaticClass()))
 		{
 			AShipPiece* ShipPiece = Cast<AShipPiece>(HitActor);
-			FTransform SocketTransform = DetectSockets(ShipPiece, HitResult.GetComponent());
-			PreviewMesh->SetWorldTransform(SocketTransform);
+			PreviewTransform = DetectSockets(ShipPiece, HitResult.GetComponent());
+			PreviewTransform.SetRotation((PreviewTransform.GetRotation().Rotator() + SocketRotation).Quaternion());
+			PreviewMesh->SetWorldTransform(PreviewTransform);
+			PreviewLockedInSocket = true;
 		}
 		else
 		{
@@ -148,6 +164,7 @@ void UPlayerBuildSystem::PreviewLoop()
 			PreviewTransform.SetLocation(NewPosition);
 			PreviewTransform.SetRotation(PreviewTransform.GetRotation());
 			PreviewMesh->SetWorldTransform(PreviewTransform);
+			PreviewLockedInSocket = false;
 		}
 
 		if(PreviewBlocked)
@@ -183,25 +200,13 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPr
 	return HitComponent->GetComponentTransform();
 }
 
-void UPlayerBuildSystem::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	PreviewBlocked = true;
-}
-
-void UPlayerBuildSystem::EndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	TArray<AActor*> OverlappingActors;
-	PreviewMesh->GetOverlappingActors(OverlappingActors);
-	if(OverlappingActors.Num() < 1)
-		PreviewBlocked = false;
-}
-
 void UPlayerBuildSystem::ResetPreviewMesh()
 {
-	PreviewMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
-	if(PreviewMesh)
+	USceneComponent* RootComponent = NewObject<USceneComponent>(this, USceneComponent::StaticClass(), TEXT("Preview"));
+	PreviewMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Preview Mesh"));
+	if(PreviewMesh && RootComponent)
 	{
-		PreviewMesh->AttachToComponent(PlayerCharacter->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		PreviewMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		PreviewMesh->RegisterComponent();
 		PreviewMesh->SetMaterial(0, CorrectPreviewMaterial);
 		PreviewMesh->SetRelativeTransform(PreviewTransform);
@@ -209,9 +214,6 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 		PreviewMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		PreviewMesh->SetCollisionObjectType(ECC_BuildPreview);
 		PreviewMesh->SetGenerateOverlapEvents(true);
-
-		PreviewMesh->OnComponentBeginOverlap.AddDynamic(this, &UPlayerBuildSystem::BeginOverlap);
-		PreviewMesh->OnComponentEndOverlap.AddDynamic(this, &UPlayerBuildSystem::EndOverlap);
 	}
 }
 
