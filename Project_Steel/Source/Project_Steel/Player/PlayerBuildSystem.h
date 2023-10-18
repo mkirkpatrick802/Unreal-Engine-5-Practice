@@ -58,6 +58,10 @@ private:
 	void RotatePreview(float Value);
 
 	FTransform DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const;
+
+	UFUNCTION()
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	bool CheckForOverlaps();
 	void ResetPreviewMesh();
 
@@ -69,6 +73,9 @@ private:
 	bool InBuildMode;
 	int ShipPartIndex;
 	bool PreviewBlocked;
+
+	UPROPERTY()
+	FBox PreviewBoundingBox;
 
 	UPROPERTY()
 	FTimerHandle RotationHandle;
@@ -90,7 +97,4 @@ private:
 
 	UPROPERTY()
 	FTransform PreviewTransform;
-
-	UPROPERTY()
-	FRotator PreviewRotation;
 };

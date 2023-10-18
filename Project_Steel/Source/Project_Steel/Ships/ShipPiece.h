@@ -51,7 +51,4 @@ public:
 
 	UPROPERTY()
 	FGameplayTagContainer ShipTags;
-
-	bool IsBuild;
-
 };
