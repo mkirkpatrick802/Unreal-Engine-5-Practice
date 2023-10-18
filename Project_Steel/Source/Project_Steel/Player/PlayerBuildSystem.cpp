@@ -125,12 +125,11 @@ void UPlayerBuildSystem::PreviewLoop()
 	FVector EndLocation = PlayerCharacter->MouseWorldLocation + (PlayerCharacter->MouseWorldDirection * 2000);
 	ECollisionChannel TraceChannel = ECC_Buildable;
 	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredComponent(PreviewMesh);
 
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, TraceChannel, CollisionParams))
 	{
 		AActor* HitActor = HitResult.GetActor();
-
-		//if(HitResult.GetComponent()->GetCollisionObjectType() == ECC_ShipPiece) return;
 
 		if (!PreviewMesh)
 		{
@@ -140,8 +139,8 @@ void UPlayerBuildSystem::PreviewLoop()
 		if (HitActor->IsA(AShipPiece::StaticClass()))
 		{
 			AShipPiece* ShipPiece = Cast<AShipPiece>(HitActor);
-			PreviewTransform = DetectSockets(ShipPiece, HitResult.GetComponent());
-			PreviewMesh->SetWorldTransform(PreviewTransform);
+			FTransform SocketTransform = DetectSockets(ShipPiece, HitResult.GetComponent());
+			PreviewMesh->SetWorldTransform(SocketTransform);
 		}
 		else
 		{
@@ -151,7 +150,7 @@ void UPlayerBuildSystem::PreviewLoop()
 			PreviewMesh->SetWorldTransform(PreviewTransform);
 		}
 
-		if(CheckForOverlaps())
+		if(PreviewBlocked)
 		{
 			PreviewMesh->SetMaterial(0, WrongPreviewMaterial);
 		}
@@ -186,32 +185,15 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPr
 
 void UPlayerBuildSystem::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.f,
-			FColor::Green,
-			FString::Printf(TEXT("Overlap"))
-		);
-	}
+	PreviewBlocked = true;
 }
 
-bool UPlayerBuildSystem::CheckForOverlaps()
+void UPlayerBuildSystem::EndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//FHitResult HitResult;
-	//FCollisionQueryParams QueryParams;
-
-	//PreviewBoundingBox = PreviewMesh->CalcBounds(PreviewTransform).GetBox();
-	//double ZRotation = PreviewTransform.GetRotation().Euler().Z;
-	//double Result = FMath::Abs(ZRotation) / 45;
-	//Result = .5 * (1 + sin(PI * (Result - .5)));
-	//auto BoxExtent = PreviewBoundingBox.GetExtent() / 1.2f;
-	//BoxExtent /= (.4f * Result) + 1;
-	//DrawDebugBox(GetWorld(), PreviewBoundingBox.GetCenter(), BoxExtent, PreviewTransform.GetRotation(), FColor::White);
-	//PreviewBlocked = GetWorld()->SweepSingleByObjectType(HitResult, PreviewBoundingBox.GetCenter(), PreviewBoundingBox.GetCenter(), PreviewTransform.GetRotation(), ECC_WorldDynamic, FCollisionShape::MakeBox(BoxExtent), QueryParams);
-
-	return PreviewBlocked;
+	TArray<AActor*> OverlappingActors;
+	PreviewMesh->GetOverlappingActors(OverlappingActors);
+	if(OverlappingActors.Num() < 1)
+		PreviewBlocked = false;
 }
 
 void UPlayerBuildSystem::ResetPreviewMesh()
@@ -229,6 +211,7 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 		PreviewMesh->SetGenerateOverlapEvents(true);
 
 		PreviewMesh->OnComponentBeginOverlap.AddDynamic(this, &UPlayerBuildSystem::BeginOverlap);
+		PreviewMesh->OnComponentEndOverlap.AddDynamic(this, &UPlayerBuildSystem::EndOverlap);
 	}
 }
 

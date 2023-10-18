@@ -12,6 +12,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Project_Steel/Ships/ShipPiece.h"
 
+#define ECC_ShipPiece ECC_GameTraceChannel3
+
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -208,7 +210,7 @@ void APlayerCharacter::StopFlying()
 			float SphereRadius = GroundCheck->GetScaledSphereRadius();
 
 			FCollisionObjectQueryParams ObjectParams;
-			ObjectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+			ObjectParams.AddObjectTypesToQuery(ECC_ShipPiece);
 
 			if(GetWorld()->SweepMultiByObjectType(HitResults, SphereCenter, SphereCenter, FQuat::Identity, ObjectParams, FCollisionShape::MakeSphere(SphereRadius), TraceParams))
 			{
