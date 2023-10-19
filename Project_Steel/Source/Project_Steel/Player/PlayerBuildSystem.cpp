@@ -164,6 +164,7 @@ void UPlayerBuildSystem::PreviewLoop()
 			PreviewTransform.SetLocation(NewPosition);
 			PreviewTransform.SetRotation(PreviewTransform.GetRotation());
 			PreviewMesh->SetWorldTransform(PreviewTransform);
+			SocketShip = nullptr;
 			PreviewLockedInSocket = false;
 		}
 
@@ -185,7 +186,7 @@ void UPlayerBuildSystem::RotatePreview(const float Value)
 	PreviewTransform.SetRotation(NewRotation.Quaternion());
 }
 
-FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const
+FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent)
 {
 	const IShipPieceInterface* Interface = Cast<IShipPieceInterface>(HitShipPiece);
 	TArray<UBoxComponent*> Sockets = Interface->Execute_GetSockets(HitShipPiece);
@@ -193,11 +194,12 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPr
 	{
 		if(Element == HitComponent)
 		{
-			break;
+			SocketShip = Element->GetOwner()->GetAttachParentActor();
+			return HitComponent->GetComponentTransform();
 		}
 	}
 
-	return HitComponent->GetComponentTransform();
+	return FTransform();
 }
 
 void UPlayerBuildSystem::ResetPreviewMesh()
@@ -219,8 +221,19 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 
 void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransform, UClass* ToSpawn)
 {
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = nullptr;
+	AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
+	if (ShipPiece->AttachToActor(SocketShip, FAttachmentTransformRules::KeepWorldTransform))
+	{
+		ShipPiece->Ship = SocketShip;
 
-	GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform, SpawnParams);
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Green,
+				FString::Printf(TEXT("Piece Attached To Ship: %d"), SocketShip->GetIsReplicated())
+			);
+		}
+	}
 }

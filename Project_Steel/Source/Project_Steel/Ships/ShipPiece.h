@@ -38,17 +38,25 @@ class PROJECT_STEEL_API AShipPiece : public AActor
 public:	
 
 	AShipPiece();
+	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 
 	virtual void BeginPlay() override;
 
-public:
-
-	virtual void Tick(float DeltaTime) override;
-
 private:
 
-	UPROPERTY()
+	void CreateNewShip();
+
+public:
+
+	UFUNCTION(Server, Unreliable)
+	void ServerSpawnShipParent(const FTransform SpawnTransform, UClass* ToSpawn);
+
+public:
+
+	UPROPERTY(Replicated)
 	AActor* Ship;
+
 };

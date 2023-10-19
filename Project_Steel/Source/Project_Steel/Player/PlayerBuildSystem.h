@@ -38,7 +38,7 @@ private:
 	void PreviewLoop();
 	void RotatePreview(float Value);
 
-	FTransform DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent) const;
+	FTransform DetectSockets(AShipPiece* HitShipPiece, const UPrimitiveComponent* HitComponent);
 	void ResetPreviewMesh();
 
 	UFUNCTION(Server, Unreliable)
@@ -81,6 +81,9 @@ private:
 
 	UPROPERTY()
 	FRotator SocketRotation;
+
+	UPROPERTY()
+	AActor* SocketShip;
 
 	UPROPERTY(EditAnywhere, Category = Building)
 	UMaterial* CorrectPreviewMaterial;
