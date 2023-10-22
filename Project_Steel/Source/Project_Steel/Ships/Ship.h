@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Ship.generated.h"
 
+class UBoxComponent;
 class UInputAction;
 struct FInputActionValue;
 class APlayerCharacter;
@@ -20,11 +21,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetControl(APlayerCharacter* Player);
-
 	void SetUpInputs(UEnhancedInputComponent* EnhancedInputComponent, const UInputAction* MoveAction);
-	void RemoveInputs(UEnhancedInputComponent* EnhancedInputComponent) const;
+	void RemoveInputs(UEnhancedInputComponent* EnhancedInputComponent);
+
+	UFUNCTION(BlueprintCallable)
+	void SetActiveCockpit(AShipPiece* Cockpit) { ActiveCockpit = Cockpit; }
+
+	bool GetIsControlled() const { return IsControlled; }
 
 protected:
 
@@ -41,9 +44,17 @@ public:
 
 private:
 
-	uint32 MoveActionHandle;
+	UPROPERTY()
+	AShipPiece* ActiveCockpit;
+
+	UPROPERTY()
+	UBoxComponent* RootBoxComponent;
+
+	uint32 MoveStartedActionHandle;
+	uint32 MoveCompletedActionHandle;
+	uint32 MoveCanceledActionHandle;
 
 	UPROPERTY(Replicated)
-	APlayerCharacter* ControllingPlayer = nullptr;
+	bool IsControlled = false;
 
 };

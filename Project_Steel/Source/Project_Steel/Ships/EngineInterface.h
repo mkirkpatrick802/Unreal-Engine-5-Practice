@@ -22,4 +22,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Engines")
 	float GetForce();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Engines")
+	UMaterial* GetFirstMaterial();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Engines")
+	UMaterial* GetSecondMaterial();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Engines")
+	void ToggleMaterial(bool UseSecondary);
+
 };

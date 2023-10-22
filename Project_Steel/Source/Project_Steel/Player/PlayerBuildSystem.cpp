@@ -236,7 +236,7 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 	PreviewMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Preview Mesh"));
 	if(PreviewMesh && RootComponent)
 	{
-		PreviewMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		PreviewMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 		PreviewMesh->RegisterComponent();
 		PreviewMesh->SetMaterial(0, CorrectPreviewMaterial);
 		PreviewMesh->SetRelativeTransform(PreviewTransform);

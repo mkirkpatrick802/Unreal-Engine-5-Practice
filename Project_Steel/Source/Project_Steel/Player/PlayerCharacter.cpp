@@ -312,12 +312,15 @@ void APlayerCharacter::Interact(const FInputActionValue& Value)
 
 void APlayerCharacter::ToggleShipControl(AShip* Ship)
 {
-	if(ControllingShip)
+
+	if(ControllingShip == Ship)
 	{
 		ControllingShip->RemoveInputs(EnhancedInputComponent);
 		ControllingShip = nullptr;
 		return;
 	}
+
+	if(Ship->GetIsControlled()) return;
 
 	ControllingShip = Ship;
 
