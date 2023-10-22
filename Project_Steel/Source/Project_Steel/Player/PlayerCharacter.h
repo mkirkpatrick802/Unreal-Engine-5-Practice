@@ -5,6 +5,10 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class AShip;
+class UInputAction;
+class UInputMappingContext;
+
 UCLASS()
 class PROJECT_STEEL_API APlayerCharacter : public ACharacter
 {
@@ -14,22 +18,26 @@ public:
 
 	APlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void ToggleShipControl(AShip* Ship);
 
 protected:
 
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputMappingContext* DefaultContext;
-
-	//Movement Inputs
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* MoveAction;
+	UInputMappingContext* DefaultContext;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* FlyAction;
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* FlyAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* InteractAction;
 
 private:
 
@@ -53,6 +61,7 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerLandingTimer(bool Value);
 
+	void Interact(const FInputActionValue& Value);
 
 public:
 
@@ -63,6 +72,9 @@ public:
 	FVector MouseWorldDirection;
 
 private:
+
+	UPROPERTY()
+	UEnhancedInputComponent* EnhancedInputComponent;
 
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* CameraBoom;
@@ -84,4 +96,7 @@ private:
 
 	UPROPERTY(Replicated)
 	bool IsFlying = false;
+
+	UPROPERTY(Replicated)
+	AShip* ControllingShip = nullptr;
 };

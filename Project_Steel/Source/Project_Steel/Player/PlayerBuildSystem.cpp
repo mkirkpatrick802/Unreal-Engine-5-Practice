@@ -3,6 +3,7 @@
 #include "EnhancedInputComponent.h"
 #include "PlayerCharacter.h"
 #include "Engine/DataTable.h"
+#include "Project_Steel/Ships/Ship.h"
 #include "Project_Steel/Ships/ShipPieceInterface.h"
 
 #define ECC_BuildPreview ECC_GameTraceChannel1
@@ -42,6 +43,34 @@ void UPlayerBuildSystem::TickComponent(const float DeltaTime, const ELevelTick T
 	if(!InBuildMode) return;
 
 	PreviewLoop();
+}
+
+void UPlayerBuildSystem::SetBuildMode(bool Set)
+{
+	InBuildMode = Set;
+
+	if (InBuildMode)
+	{
+		TMap<FName, uint8*> RowMap = ShipParts->GetRowMap();
+
+		for (const auto& Element : RowMap)
+		{
+			const FName RowName = Element.Key;
+
+			if (const FShipParts* Part = ShipParts->FindRow<FShipParts>(RowName, FString()))
+			{
+				ShipPartsArray.Add(*Part);
+			}
+		}
+	}
+	else
+	{
+		if (PreviewMesh)
+		{
+			PreviewMesh->DestroyComponent();
+			PreviewMesh = nullptr;
+		}
+	}
 }
 
 void UPlayerBuildSystem::ToggleBuildMode(const FInputActionValue& Value)
@@ -121,7 +150,6 @@ void UPlayerBuildSystem::CyclePreview(const FInputActionValue& Value)
 	{
 		PreviewMesh->DestroyComponent();
 		PreviewMesh = nullptr;
-		ResetPreviewMesh();
 	}
 }
 
@@ -216,6 +244,8 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 		PreviewMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		PreviewMesh->SetCollisionObjectType(ECC_BuildPreview);
 		PreviewMesh->SetGenerateOverlapEvents(true);
+
+		PreviewMesh->UpdateOverlaps();
 	}
 }
 
@@ -224,7 +254,8 @@ void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransf
 	AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
 	if (ShipPiece->AttachToActor(SocketShip, FAttachmentTransformRules::KeepWorldTransform))
 	{
-		ShipPiece->Ship = SocketShip;
+		ShipPiece->Ship = static_cast<AShip*>(SocketShip);
+		ShipPiece->Placed();
 
 		if (GEngine)
 		{

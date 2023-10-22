@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "ShipPiece.generated.h"
 
+class APlayerCharacter;
 class AShip;
 
 USTRUCT(BlueprintType)
@@ -45,6 +46,14 @@ protected:
 
 	virtual void BeginPlay() override;
 
+public:
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Interact(APlayerCharacter* Player);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Placed();
+
 private:
 
 	void CreateNewShip();
@@ -56,7 +65,7 @@ public:
 
 public:
 
-	UPROPERTY(Replicated)
-	AActor* Ship;
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	AShip* Ship;
 
 };

@@ -6,10 +6,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "PlayerBuildSystem.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Project_Steel/Ships/Ship.h"
 #include "Project_Steel/Ships/ShipPiece.h"
 
 #define ECC_ShipPiece ECC_GameTraceChannel3
@@ -52,7 +54,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent)
 	{
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
@@ -62,6 +65,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Started, this, &APlayerCharacter::FlyingDelta);
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Canceled, this, &APlayerCharacter::FlyingDelta);
 		EnhancedInputComponent->BindAction(FlyAction, ETriggerEvent::Completed, this, &APlayerCharacter::FlyingDelta);
+
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::Interact);
 
 		if(PlayerBuildSystem)
 		{
@@ -96,7 +102,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Rotate();
+	if(!ControllingShip)
+		Rotate();
 }
 
 /*
@@ -104,6 +111,18 @@ void APlayerCharacter::Tick(float DeltaTime)
  *	Player Rotations
  *
  */
+
+void APlayerCharacter::Rotate()
+{
+	if (HasAuthority())
+	{
+		RotateToMouse();
+	}
+	else
+	{
+		ServerRotate(false, RotateToMouse());
+	}
+}
 
 FRotator APlayerCharacter::RotateToMouse()
 {
@@ -125,18 +144,6 @@ FRotator APlayerCharacter::RotateToMouse()
 	}
 
 	return FRotator(0, 0, 0);
-}
-
-void APlayerCharacter::Rotate()
-{
-	if(HasAuthority())
-	{
-		RotateToMouse();
-	}
-	else
-	{
-		ServerRotate(false, RotateToMouse());
-	}
 }
 
 void APlayerCharacter::ServerRotate_Implementation(bool IsMoving, FRotator Rotator)
@@ -169,6 +176,8 @@ void APlayerCharacter::ServerRotate_Implementation(bool IsMoving, FRotator Rotat
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
+	if(ControllingShip) return;
+
 	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
 		MovementComponent->bOrientRotationToMovement = true;
@@ -236,6 +245,8 @@ void APlayerCharacter::StopFlying()
 
 void APlayerCharacter::FlyingDelta(const FInputActionValue& Value)
 {
+	if (ControllingShip) return;
+
 	ServerSetFlying(Value.Get<bool>());
 }
 
@@ -274,4 +285,44 @@ void APlayerCharacter::ServerLandingTimer_Implementation(bool Value)
 	{
 		MovementComponent->bCanWalkOffLedges = Value;
 	}
+}
+
+/*
+ *
+ *	Player Interactions
+ *
+ */
+
+void APlayerCharacter::Interact(const FInputActionValue& Value)
+{
+	AActor* Interactable = nullptr;
+	TArray<UPrimitiveComponent*> OverlappingComponents;
+	Cast<UCapsuleComponent>(GetRootComponent())->GetOverlappingComponents(OverlappingComponents);
+	for (auto i : OverlappingComponents)
+	{
+		if (!i->ComponentHasTag(FName("Interactable"))) continue;
+		Interactable = i->GetOwner();
+		break;
+	}
+
+	if (!Interactable) return;
+
+	static_cast<AShipPiece*>(Interactable)->Interact(this);
+}
+
+void APlayerCharacter::ToggleShipControl(AShip* Ship)
+{
+	if(ControllingShip)
+	{
+		ControllingShip->RemoveInputs(EnhancedInputComponent);
+		ControllingShip = nullptr;
+		return;
+	}
+
+	ControllingShip = Ship;
+
+	if(PlayerBuildSystem)
+		PlayerBuildSystem->SetBuildMode(false);
+
+	ControllingShip->SetUpInputs(EnhancedInputComponent, MoveAction);
 }

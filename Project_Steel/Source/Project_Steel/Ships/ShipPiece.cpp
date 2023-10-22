@@ -2,6 +2,7 @@
 
 #include "Ship.h"
 #include "Net/UnrealNetwork.h"
+#include "Project_Steel/Player/PlayerCharacter.h"
 
 
 AShipPiece::AShipPiece() :
@@ -16,6 +17,16 @@ void AShipPiece::BeginPlay()
 
 	FTimerHandle DelayHandle;
 	GetWorldTimerManager().SetTimer(DelayHandle, this, &AShipPiece::CreateNewShip, 0.01f, false);
+}
+
+void AShipPiece::Interact_Implementation(APlayerCharacter* Player)
+{
+
+}
+
+void AShipPiece::Placed_Implementation()
+{
+
 }
 
 void AShipPiece::CreateNewShip()
