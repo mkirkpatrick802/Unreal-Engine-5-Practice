@@ -54,9 +54,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Placed();
 
-	UFUNCTION(BlueprintCallable)
-	void ConfigurePiece();
-
 private:
 
 	void CreateNewShip();

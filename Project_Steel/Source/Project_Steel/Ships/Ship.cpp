@@ -13,13 +13,12 @@
 
 AShip::AShip()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	RootBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Root Component"));
 	RootBoxComponent->SetupAttachment(RootBoxComponent);
 	RootBoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	RootBoxComponent->SetCollisionObjectType(ECC_ShipContainer);
-	RootBoxComponent->SetCollisionResponseToChannel(ECC_ShipPiece, ECR_Ignore);
 	RootBoxComponent->SetSimulatePhysics(true);
 
 	SetRootComponent(RootBoxComponent);

@@ -4,8 +4,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Project_Steel/Player/PlayerCharacter.h"
 
-#define ECC_ShipContainer ECC_GameTraceChannel5
-
 AShipPiece::AShipPiece() :
 	Ship(nullptr)
 {
@@ -21,8 +19,6 @@ void AShipPiece::BeginPlay()
 
 	FTimerHandle DelayHandle;
 	GetWorldTimerManager().SetTimer(DelayHandle, this, &AShipPiece::CreateNewShip, 0.01f, false);
-
-	ConfigurePiece();
 }
 
 void AShipPiece::Interact_Implementation(APlayerCharacter* Player)
@@ -35,15 +31,12 @@ void AShipPiece::Placed_Implementation()
 
 }
 
-void AShipPiece::ConfigurePiece()
-{
-	MeshComponent->SetCollisionResponseToChannel(ECC_ShipContainer, ECR_Block);
-}
-
 void AShipPiece::CreateNewShip()
 {
 	if (!Ship)
 	{
+		FTransform SpawnTransform = GetTransform();
+		SpawnTransform.SetLocation(FVector(SpawnTransform.GetLocation().X, SpawnTransform.GetLocation().Y, 200));
 		ServerSpawnShipParent(GetTransform(), AShip::StaticClass());
 	}
 }
