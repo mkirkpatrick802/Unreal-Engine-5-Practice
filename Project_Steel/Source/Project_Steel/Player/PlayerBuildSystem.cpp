@@ -254,7 +254,8 @@ void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransf
 	AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
 	if (ShipPiece->AttachToActor(SocketShip, FAttachmentTransformRules::KeepWorldTransform))
 	{
-		ShipPiece->Ship = static_cast<AShip*>(SocketShip);
+		AShip* ExistingShip = static_cast<AShip*>(SocketShip);
+		ShipPiece->Ship = ExistingShip;
 		ShipPiece->Placed();
 
 		if (GEngine)
@@ -263,7 +264,7 @@ void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransf
 				-1,
 				15.f,
 				FColor::Green,
-				FString::Printf(TEXT("Piece Attached To Ship: %d"), SocketShip->GetIsReplicated())
+				FString::Printf(TEXT("Piece Attached To Ship"))
 			);
 		}
 	}

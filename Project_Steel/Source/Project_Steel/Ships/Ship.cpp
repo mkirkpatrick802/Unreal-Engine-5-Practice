@@ -8,6 +8,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Project_Steel/Player/PlayerCharacter.h"
 
+#define ECC_ShipContainer ECC_GameTraceChannel5
+#define ECC_ShipPiece ECC_GameTraceChannel3
 
 AShip::AShip()
 {
@@ -16,7 +18,8 @@ AShip::AShip()
 	RootBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Root Component"));
 	RootBoxComponent->SetupAttachment(RootBoxComponent);
 	RootBoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	RootBoxComponent->SetCollisionObjectType(ECC_Vehicle);
+	RootBoxComponent->SetCollisionObjectType(ECC_ShipContainer);
+	RootBoxComponent->SetCollisionResponseToChannel(ECC_ShipPiece, ECR_Ignore);
 	RootBoxComponent->SetSimulatePhysics(true);
 
 	SetRootComponent(RootBoxComponent);

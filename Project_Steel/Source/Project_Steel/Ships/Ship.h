@@ -47,7 +47,7 @@ private:
 	UPROPERTY()
 	AShipPiece* ActiveCockpit;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	UBoxComponent* RootBoxComponent;
 
 	uint32 MoveStartedActionHandle;

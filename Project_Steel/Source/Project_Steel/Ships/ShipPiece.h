@@ -54,6 +54,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Placed();
 
+	UFUNCTION(BlueprintCallable)
+	void ConfigurePiece();
+
 private:
 
 	void CreateNewShip();
@@ -67,5 +70,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Replicated)
 	AShip* Ship;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* MeshComponent;
 
 };
