@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Ship.generated.h"
 
+class UPhysicsConstraintComponent;
 class UBoxComponent;
 class UInputAction;
 struct FInputActionValue;
@@ -29,6 +30,8 @@ public:
 
 	bool GetIsControlled() const { return IsControlled; }
 
+	void AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -47,8 +50,14 @@ private:
 	UPROPERTY()
 	AShipPiece* ActiveCockpit;
 
+	UPROPERTY()
+	TArray<AShipPiece*> AttachedShipPieces;
+
 	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* RootBoxComponent;
+	UStaticMeshComponent* RootMeshComponent;
+
+	UPROPERTY(EditAnywhere)
+	UPhysicsConstraintComponent* PhysicsConstraintComponent;
 
 	uint32 MoveStartedActionHandle;
 	uint32 MoveCompletedActionHandle;

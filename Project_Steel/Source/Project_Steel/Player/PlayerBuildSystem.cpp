@@ -222,7 +222,7 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPr
 	{
 		if(Element == HitComponent)
 		{
-			SocketShip = Element->GetOwner()->GetAttachParentActor();
+			SocketShip = Cast<AShipPiece>(Element->GetOwner())->Ship;
 			return HitComponent->GetComponentTransform();
 		}
 	}
@@ -251,21 +251,15 @@ void UPlayerBuildSystem::ResetPreviewMesh()
 
 void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransform, UClass* ToSpawn)
 {
-	AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
-	if (ShipPiece->AttachToActor(SocketShip, FAttachmentTransformRules::KeepWorldTransform))
+	if(SocketShip)
 	{
-		AShip* ExistingShip = static_cast<AShip*>(SocketShip);
-		ShipPiece->Ship = ExistingShip;
-		ShipPiece->Placed();
-
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.f,
-				FColor::Green,
-				FString::Printf(TEXT("Piece Attached To Ship"))
-			);
-		}
+		AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
+		AShip* Ship = Cast<AShip>(SocketShip);
+		ShipPiece->Ship = Ship;
+		Ship->AddShipPiece(ShipPiece, SpawnTransform);
+	}
+	else
+	{
+		AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
 	}
 }

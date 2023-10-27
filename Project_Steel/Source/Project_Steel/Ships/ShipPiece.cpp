@@ -11,6 +11,7 @@ AShipPiece::AShipPiece() :
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ship Piece"));
 	MeshComponent->SetupAttachment(GetRootComponent());
+	MeshComponent->SetSimulatePhysics(true);
 }
 
 void AShipPiece::BeginPlay()
@@ -56,16 +57,5 @@ void AShipPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 void AShipPiece::ServerSpawnShipParent_Implementation(const FTransform SpawnTransform, UClass* ToSpawn)
 {
 	Ship = GetWorld()->SpawnActor<AShip>(ToSpawn, SpawnTransform);
-	if (AttachToActor(Ship, FAttachmentTransformRules::KeepWorldTransform))
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.f,
-				FColor::Green,
-				FString::Printf(TEXT("Ship Made"))
-			);
-		}
-	}
+	Ship->AddShipPiece(this, GetTransform());
 }
