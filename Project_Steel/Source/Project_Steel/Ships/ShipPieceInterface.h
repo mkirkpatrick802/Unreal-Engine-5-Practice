@@ -19,4 +19,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Sockets")
 	TArray<UBoxComponent*> GetSockets();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collisions")
+	TArray<UBoxComponent*> GetColliders();
 };

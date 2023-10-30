@@ -4,14 +4,20 @@
 #include "Net/UnrealNetwork.h"
 #include "Project_Steel/Player/PlayerCharacter.h"
 
+#define ECC_ShipPiece ECC_GameTraceChannel3
+#define ECC_ShipContainer ECC_GameTraceChannel5
+
 AShipPiece::AShipPiece() :
-	Ship(nullptr)
+	CurrentShip(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ship Piece"));
 	MeshComponent->SetupAttachment(GetRootComponent());
-	MeshComponent->SetSimulatePhysics(true);
+	SetRootComponent(MeshComponent);
+
+	MeshComponent->SetCollisionObjectType(ECC_ShipPiece);
+	MeshComponent->SetSimulatePhysics(false);
 }
 
 void AShipPiece::BeginPlay()
@@ -34,11 +40,11 @@ void AShipPiece::Placed_Implementation()
 
 void AShipPiece::CreateNewShip()
 {
-	if (!Ship)
+	if (!CurrentShip)
 	{
 		FTransform SpawnTransform = GetTransform();
 		SpawnTransform.SetLocation(FVector(SpawnTransform.GetLocation().X, SpawnTransform.GetLocation().Y, 200));
-		ServerSpawnShipParent(GetTransform(), AShip::StaticClass());
+		ServerSpawnShipParent(GetTransform(), ShipContainerClass);
 	}
 }
 
@@ -51,11 +57,11 @@ void AShipPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AShipPiece, Ship);
+	DOREPLIFETIME(AShipPiece, CurrentShip);
 }
 
-void AShipPiece::ServerSpawnShipParent_Implementation(const FTransform SpawnTransform, UClass* ToSpawn)
+void AShipPiece::ServerSpawnShipParent_Implementation(const FTransform SpawnTransform, UObject* ToSpawn)
 {
-	Ship = GetWorld()->SpawnActor<AShip>(ToSpawn, SpawnTransform);
-	Ship->AddShipPiece(this, GetTransform());
+	CurrentShip = GetWorld()->SpawnActor<AShip>(ToSpawn->GetClass(), SpawnTransform);
+	CurrentShip->AddShipPiece(this, GetTransform());
 }

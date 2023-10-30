@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Ship.generated.h"
 
+class USphereComponent;
 class APhysicsConstraintActor;
 class UPhysicsConstraintComponent;
 class UBoxComponent;
@@ -31,6 +32,7 @@ public:
 
 	bool GetIsControlled() const { return IsControlled; }
 
+	UFUNCTION(BlueprintImplementableEvent)
 	void AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform);
 
 protected:
@@ -53,12 +55,6 @@ private:
 
 	UPROPERTY()
 	TArray<AShipPiece*> AttachedShipPieces;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* RootMeshComponent;
-
-	UPROPERTY(EditAnywhere)
-	APhysicsConstraintActor* LatestPhysicsConstraintActor;
 
 	uint32 MoveStartedActionHandle;
 	uint32 MoveCompletedActionHandle;

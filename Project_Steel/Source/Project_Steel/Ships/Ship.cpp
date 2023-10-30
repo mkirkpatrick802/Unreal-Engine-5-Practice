@@ -4,28 +4,23 @@
 #include "EngineInterface.h"
 #include "EnhancedInputComponent.h"
 #include "ShipPiece.h"
+#include "ShipPieceInterface.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "PhysicsEngine/PhysicsConstraintActor.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Project_Steel/Player/PlayerCharacter.h"
 
+#define ECC_BuildPreview ECC_GameTraceChannel1
 #define ECC_ShipContainer ECC_GameTraceChannel5
 #define ECC_ShipPiece ECC_GameTraceChannel3
+#define ECC_BuildSocket ECC_GameTraceChannel2
+#define ECC_Buildable ECC_GameTraceChannel4
 
 AShip::AShip()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Root Component"));
-	RootMeshComponent->SetupAttachment(RootMeshComponent);
-	RootMeshComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	RootMeshComponent->SetCollisionObjectType(ECC_ShipContainer);
-	RootMeshComponent->SetCollisionResponseToChannel(ECC_ShipPiece, ECR_Ignore);
-	RootMeshComponent->SetSimulatePhysics(true);
-
-	SetRootComponent(RootMeshComponent);
-
+	//Networking
 	bReplicates = true;
 }
 
@@ -39,36 +34,6 @@ void AShip::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AShip, IsControlled);
-}
-
-void AShip::AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform)
-{
-
-	LatestPhysicsConstraintActor = GetWorld()->SpawnActor<APhysicsConstraintActor>(APhysicsConstraintActor::StaticClass());
-	LatestPhysicsConstraintActor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	//ShipPiece->AttachToActor(LatestPhysicsConstraintActor, FAttachmentTransformRules::KeepRelativeTransform);
-
-	const auto PhysicsConstraint = LatestPhysicsConstraintActor->GetConstraintComp();
-
-	PhysicsConstraint->ConstraintActor1 = this;
-	PhysicsConstraint->ConstraintActor2 = ShipPiece;
-
-	PhysicsConstraint->ComponentName1.ComponentName = FName("Root Component");
-	PhysicsConstraint->ComponentName2.ComponentName = FName("Ship Piece");
-
-	PhysicsConstraint->SetLinearXLimit(LCM_Locked, 0);
-	PhysicsConstraint->SetLinearYLimit(LCM_Locked, 0);
-	PhysicsConstraint->SetLinearZLimit(LCM_Locked, 0);
-
-	PhysicsConstraint->ConstraintInstance.SetLinearXMotion(LCM_Locked);
-	PhysicsConstraint->ConstraintInstance.SetLinearYMotion(LCM_Locked);
-	PhysicsConstraint->ConstraintInstance.SetLinearZMotion(LCM_Locked);
-
-	PhysicsConstraint->ConstraintInstance.SetAngularSwing1Motion(ACM_Locked);
-	PhysicsConstraint->ConstraintInstance.SetAngularSwing2Motion(ACM_Locked);
-	PhysicsConstraint->ConstraintInstance.SetAngularTwistMotion(ACM_Locked);
-
-	//PhysicsConstraint->ConstraintInstance.EnableParentDominates();
 }
 
 void AShip::BeginPlay()
@@ -123,8 +88,9 @@ void AShip::Move(const FInputActionValue& Value)
 		EngineInterface->Execute_ToggleMaterial(CorrectEngine, true);
 
 		FVector ForceDirection = EngineInterface->Execute_GetPushVector(CorrectEngine).GetSafeNormal2D();
-		float ForcePower = EngineInterface->Execute_GetForce(CorrectEngine);
+		const float ForcePower = EngineInterface->Execute_GetForce(CorrectEngine);
+		const FVector TotalForce = ForceDirection * ForcePower;
 
-		RootMeshComponent->AddForce(ForceDirection * ForcePower, NAME_None, true);
+		//RootCollisionComponent->AddForce(TotalForce, NAME_None, false);
 	}
 }

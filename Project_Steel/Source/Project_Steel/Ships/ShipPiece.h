@@ -61,12 +61,15 @@ private:
 public:
 
 	UFUNCTION(Server, Unreliable)
-	void ServerSpawnShipParent(const FTransform SpawnTransform, UClass* ToSpawn);
+	void ServerSpawnShipParent(const FTransform SpawnTransform, UObject* ToSpawn);
 
 public:
 
+	UPROPERTY(EditAnywhere, Category = ShipContainer)
+	UObject* ShipContainerClass;
+
 	UPROPERTY(BlueprintReadOnly, Replicated)
-	AShip* Ship;
+	AShip* CurrentShip;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* MeshComponent;

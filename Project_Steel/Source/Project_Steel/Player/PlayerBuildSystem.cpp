@@ -222,12 +222,12 @@ FTransform UPlayerBuildSystem::DetectSockets(AShipPiece* HitShipPiece, const UPr
 	{
 		if(Element == HitComponent)
 		{
-			SocketShip = Cast<AShipPiece>(Element->GetOwner())->Ship;
+			SocketShip = Cast<AShipPiece>(Element->GetOwner())->CurrentShip;
 			return HitComponent->GetComponentTransform();
 		}
 	}
 
-	return FTransform();
+	return HitShipPiece->GetTransform();
 }
 
 void UPlayerBuildSystem::ResetPreviewMesh()
@@ -255,7 +255,7 @@ void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransf
 	{
 		AShipPiece* ShipPiece = GetWorld()->SpawnActor<AShipPiece>(ToSpawn, SpawnTransform);
 		AShip* Ship = Cast<AShip>(SocketShip);
-		ShipPiece->Ship = Ship;
+		ShipPiece->CurrentShip = Ship;
 		Ship->AddShipPiece(ShipPiece, SpawnTransform);
 	}
 	else
