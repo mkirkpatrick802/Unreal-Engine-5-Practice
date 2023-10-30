@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Ship.generated.h"
 
+class APhysicsConstraintActor;
 class UPhysicsConstraintComponent;
 class UBoxComponent;
 class UInputAction;
@@ -57,7 +58,7 @@ private:
 	UStaticMeshComponent* RootMeshComponent;
 
 	UPROPERTY(EditAnywhere)
-	UPhysicsConstraintComponent* PhysicsConstraintComponent;
+	APhysicsConstraintActor* LatestPhysicsConstraintActor;
 
 	uint32 MoveStartedActionHandle;
 	uint32 MoveCompletedActionHandle;

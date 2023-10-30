@@ -6,6 +6,7 @@
 #include "ShipPiece.h"
 #include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "PhysicsEngine/PhysicsConstraintActor.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Project_Steel/Player/PlayerCharacter.h"
 
@@ -42,43 +43,32 @@ void AShip::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 
 void AShip::AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform)
 {
-	//ShipPiece->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 
-	UPhysicsConstraintComponent* NewPhysicsConstraintComponent = NewObject<UPhysicsConstraintComponent>(this, FName("Physics Constraint"));
-	NewPhysicsConstraintComponent->RegisterComponent();
-	NewPhysicsConstraintComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	LatestPhysicsConstraintActor = GetWorld()->SpawnActor<APhysicsConstraintActor>(APhysicsConstraintActor::StaticClass());
+	LatestPhysicsConstraintActor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//ShipPiece->AttachToActor(LatestPhysicsConstraintActor, FAttachmentTransformRules::KeepRelativeTransform);
 
-	NewPhysicsConstraintComponent->ComponentName1.ComponentName = FName(GetRootComponent()->GetName());
-	NewPhysicsConstraintComponent->ComponentName2.ComponentName = FName(ShipPiece->GetRootComponent()->GetName());
+	const auto PhysicsConstraint = LatestPhysicsConstraintActor->GetConstraintComp();
 
-	NewPhysicsConstraintComponent->ConstraintActor1 = this;
-	NewPhysicsConstraintComponent->ConstraintActor2 = ShipPiece;
+	PhysicsConstraint->ConstraintActor1 = this;
+	PhysicsConstraint->ConstraintActor2 = ShipPiece;
 
-	NewPhysicsConstraintComponent->SetLinearXLimit(LCM_Locked, 0);
-	NewPhysicsConstraintComponent->SetLinearYLimit(LCM_Locked, 0);
-	NewPhysicsConstraintComponent->SetLinearZLimit(LCM_Locked, 0);
+	PhysicsConstraint->ComponentName1.ComponentName = FName("Root Component");
+	PhysicsConstraint->ComponentName2.ComponentName = FName("Ship Piece");
 
-	NewPhysicsConstraintComponent->ConstraintInstance.SetLinearXMotion(LCM_Locked);
-	NewPhysicsConstraintComponent->ConstraintInstance.SetLinearYMotion(LCM_Locked);
-	NewPhysicsConstraintComponent->ConstraintInstance.SetLinearZMotion(LCM_Locked);
+	PhysicsConstraint->SetLinearXLimit(LCM_Locked, 0);
+	PhysicsConstraint->SetLinearYLimit(LCM_Locked, 0);
+	PhysicsConstraint->SetLinearZLimit(LCM_Locked, 0);
 
-	NewPhysicsConstraintComponent->ConstraintInstance.SetAngularSwing1Motion(ACM_Locked);
-	NewPhysicsConstraintComponent->ConstraintInstance.SetAngularSwing2Motion(ACM_Locked);
-	NewPhysicsConstraintComponent->ConstraintInstance.SetAngularTwistMotion(ACM_Locked);
+	PhysicsConstraint->ConstraintInstance.SetLinearXMotion(LCM_Locked);
+	PhysicsConstraint->ConstraintInstance.SetLinearYMotion(LCM_Locked);
+	PhysicsConstraint->ConstraintInstance.SetLinearZMotion(LCM_Locked);
 
-	NewPhysicsConstraintComponent->ConstraintInstance.EnableParentDominates();
-	PhysicsConstraintComponent = NewPhysicsConstraintComponent;
+	PhysicsConstraint->ConstraintInstance.SetAngularSwing1Motion(ACM_Locked);
+	PhysicsConstraint->ConstraintInstance.SetAngularSwing2Motion(ACM_Locked);
+	PhysicsConstraint->ConstraintInstance.SetAngularTwistMotion(ACM_Locked);
 
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.f,
-			FColor::Green,
-			FString::Printf(TEXT("%i"), NewPhysicsConstraintComponent->IsBroken())
-		);
-	}
+	//PhysicsConstraint->ConstraintInstance.EnableParentDominates();
 }
 
 void AShip::BeginPlay()
