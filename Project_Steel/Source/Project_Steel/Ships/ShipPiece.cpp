@@ -44,7 +44,7 @@ void AShipPiece::CreateNewShip()
 	{
 		FTransform SpawnTransform = GetTransform();
 		SpawnTransform.SetLocation(FVector(SpawnTransform.GetLocation().X, SpawnTransform.GetLocation().Y, 200));
-		ServerSpawnShipParent(GetTransform(), ShipContainerClass);
+		ServerSpawnShipParent(GetTransform());
 	}
 }
 
@@ -60,8 +60,9 @@ void AShipPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AShipPiece, CurrentShip);
 }
 
-void AShipPiece::ServerSpawnShipParent_Implementation(const FTransform SpawnTransform, UObject* ToSpawn)
+void AShipPiece::ServerSpawnShipParent_Implementation(const FTransform SpawnTransform)
 {
-	CurrentShip = GetWorld()->SpawnActor<AShip>(ToSpawn->GetClass(), SpawnTransform);
+	CurrentShip = GetWorld()->SpawnActor<AShip>(AShip::StaticClass(), SpawnTransform);
 	CurrentShip->AddShipPiece(this, GetTransform());
+	Placed();
 }

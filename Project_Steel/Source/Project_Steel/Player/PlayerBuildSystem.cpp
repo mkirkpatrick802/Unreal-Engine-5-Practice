@@ -257,6 +257,7 @@ void UPlayerBuildSystem::ServerSpawn_Implementation(const FTransform SpawnTransf
 		AShip* Ship = Cast<AShip>(SocketShip);
 		ShipPiece->CurrentShip = Ship;
 		Ship->AddShipPiece(ShipPiece, SpawnTransform);
+		ShipPiece->Placed();
 	}
 	else
 	{

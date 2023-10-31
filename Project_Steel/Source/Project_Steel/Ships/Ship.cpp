@@ -27,6 +27,15 @@ AShip::AShip()
 void AShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	for (auto Element : GetComponents())
+	{
+		if(auto Box = Cast<UBoxComponent>(Element))
+		{
+			DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetUnscaledBoxExtent(), Box->GetComponentRotation().Quaternion(), FColor::Red, false, .1, 0, 5.0f);
+		}
+	}
+
 }
 
 void AShip::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -34,6 +43,24 @@ void AShip::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AShip, IsControlled);
+}
+
+void AShip::AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform)
+{
+
+	const IShipPieceInterface* Interface = Cast<IShipPieceInterface>(ShipPiece);
+	TArray<UBoxComponent*> Colliders = Interface->Execute_GetColliders(ShipPiece);
+
+	UBoxComponent* NewBoxComponent = Cast<UBoxComponent>(AddComponentByClass(UBoxComponent::StaticClass(), false, FTransform(), false));
+	NewBoxComponent->SetWorldTransform(PieceTransform);
+	NewBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	NewBoxComponent->SetCollisionObjectType(ECC_ShipContainer);
+	NewBoxComponent->SetCollisionResponseToChannel(ECC_ShipContainer, ECR_Block);
+	NewBoxComponent->SetSimulatePhysics(true);
+
+	NewBoxComponent->InitBoxExtent(Colliders[0]->GetUnscaledBoxExtent());
+
+	ShipPiece->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void AShip::BeginPlay()
@@ -91,6 +118,6 @@ void AShip::Move(const FInputActionValue& Value)
 		const float ForcePower = EngineInterface->Execute_GetForce(CorrectEngine);
 		const FVector TotalForce = ForceDirection * ForcePower;
 
-		//RootCollisionComponent->AddForce(TotalForce, NAME_None, false);
+		Cast<UBoxComponent>(RootComponent)->AddForce(TotalForce, NAME_None, false);
 	}
 }

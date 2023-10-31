@@ -32,7 +32,6 @@ public:
 
 	bool GetIsControlled() const { return IsControlled; }
 
-	UFUNCTION(BlueprintImplementableEvent)
 	void AddShipPiece(AShipPiece* ShipPiece, FTransform PieceTransform);
 
 protected:
