@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "StingerCharacter.h"
+
+#include "CombatComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Net/UnrealNetwork.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -16,6 +19,7 @@
 
 AStingerCharacter::AStingerCharacter()
 {
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -25,11 +29,8 @@ AStingerCharacter::AStingerCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -39,16 +40,39 @@ AStingerCharacter::AStingerCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraBoom->TargetArmLength = 500.0f;
+	CameraBoom->SocketOffset.Z = 40;
+	CameraBoom->bUsePawnControlRotation = true;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	//Create a combat component
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true);
+}
+
+void AStingerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(Combat)
+	{
+		Combat->Character = this;
+	}
+}
+
+void AStingerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AStingerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	AimOffset(DeltaSeconds);
 }
 
 void AStingerCharacter::BeginPlay()
@@ -66,6 +90,16 @@ void AStingerCharacter::BeginPlay()
 	}
 }
 
+AWeapon* AStingerCharacter::GetEquippedWeapon()
+{
+	return EquipWeapon;
+}
+
+bool AStingerCharacter::IsAiming()
+{
+	return (Combat && Combat->IsAiming);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -75,8 +109,9 @@ void AStingerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Canceled, this, &ACharacter::StopJumping);
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AStingerCharacter::Move);
@@ -84,8 +119,16 @@ void AStingerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AStingerCharacter::Look);
 
-	}
+		//Crouching
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AStingerCharacter::ToggleCrouch);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AStingerCharacter::ToggleCrouch);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Canceled, this, &AStingerCharacter::ToggleCrouch);
 
+		//Aim
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AStingerCharacter::ToggleAim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AStingerCharacter::ToggleAim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Canceled, this, &AStingerCharacter::ToggleAim);
+	}
 }
 
 void AStingerCharacter::Move(const FInputActionValue& Value)
@@ -124,6 +167,52 @@ void AStingerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AStingerCharacter::ToggleCrouch(const FInputActionValue& Value)
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
 
+void AStingerCharacter::ToggleAim(const FInputActionValue& Value)
+{
+	if (Combat)
+	{
+		Combat->ToggleAiming();
 
+		bUseControllerRotationYaw = Combat->IsAiming;
+		ServerUpdateControlRotation(Combat->IsAiming);
 
+		CameraBoom->TargetArmLength = Combat->IsAiming ? 200 : 500;
+		CameraBoom->SocketOffset.Y = Combat->IsAiming ? 80 : 0;
+		CameraBoom->SocketOffset.Z = Combat->IsAiming ? 80 : 40;
+	}
+}
+
+void AStingerCharacter::ServerUpdateControlRotation_Implementation(bool SetControlRotationYaw)
+{
+	bUseControllerRotationYaw = SetControlRotationYaw;
+}
+
+void AStingerCharacter::AimOffset(float DeltaTime)
+{
+	if(!IsAiming())
+	{
+		AO_Pitch = 0;
+		return;
+	}
+
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if(AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		// Map pitch from [270, 360) to [-90, 0)
+		const FVector2D InRange(270.f, 360.f);
+		const FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
+}

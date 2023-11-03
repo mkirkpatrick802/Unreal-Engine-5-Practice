@@ -22,8 +22,23 @@ protected:
 	float Speed;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	float AO_Pitch;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsInAir;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsAccelerating;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	bool IsCrouched;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	bool IsAiming;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	class AWeapon* EquippedWeapon;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	FTransform LeftHandTransform;
 };
