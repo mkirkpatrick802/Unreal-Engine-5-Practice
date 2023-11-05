@@ -51,12 +51,18 @@ class AStingerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AimAction;
 
+	/** Aim Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* FireAction;
+
 public:
 
 	AStingerCharacter();
 	virtual void PostInitializeComponents() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	void PlayFireMontage();
 
 protected:
 
@@ -73,6 +79,8 @@ protected:
 	void ToggleAim(const FInputActionValue& Value);
 
 	void AimOffset(float DeltaTime);
+
+	void ToggleFireWeapon();
 
 private:
 
@@ -106,8 +114,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	AWeapon* EquipWeapon;
 
+	UPROPERTY(EditAnywhere, Category = Combat)
+	class UAnimMontage* FireWeaponMontage;
 private:
 
 	float AO_Pitch;
-
 };

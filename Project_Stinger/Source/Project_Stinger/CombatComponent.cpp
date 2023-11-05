@@ -33,6 +33,12 @@ void UCombatComponent::ToggleAiming()
 	ServerSetAiming(IsAiming);
 }
 
+void UCombatComponent::Fire()
+{
+	if (Character)
+		Character->PlayFireMontage();
+}
+
 void UCombatComponent::ServerSetAiming_Implementation(bool Aiming)
 {
 	IsAiming = Aiming;

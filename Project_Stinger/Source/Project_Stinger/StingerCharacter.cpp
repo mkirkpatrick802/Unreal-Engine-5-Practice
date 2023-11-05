@@ -128,6 +128,9 @@ void AStingerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AStingerCharacter::ToggleAim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AStingerCharacter::ToggleAim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Canceled, this, &AStingerCharacter::ToggleAim);
+
+		//Fire
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AStingerCharacter::ToggleFireWeapon);
 	}
 }
 
@@ -186,6 +189,7 @@ void AStingerCharacter::ToggleAim(const FInputActionValue& Value)
 		Combat->ToggleAiming();
 
 		bUseControllerRotationYaw = Combat->IsAiming;
+		GetCharacterMovement()->bOrientRotationToMovement = !Combat->IsAiming;
 		ServerUpdateControlRotation(Combat->IsAiming);
 
 		CameraBoom->TargetArmLength = Combat->IsAiming ? 200 : 500;
@@ -214,5 +218,24 @@ void AStingerCharacter::AimOffset(float DeltaTime)
 		const FVector2D InRange(270.f, 360.f);
 		const FVector2D OutRange(-90.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
+}
+
+void AStingerCharacter::ToggleFireWeapon()
+{
+
+	if(Combat)
+		Combat->Fire();
+}
+
+void AStingerCharacter::PlayFireMontage()
+{
+	if(Combat)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if(AnimInstance && FireWeaponMontage)
+		{
+			AnimInstance->Montage_Play(FireWeaponMontage);
+		}
 	}
 }

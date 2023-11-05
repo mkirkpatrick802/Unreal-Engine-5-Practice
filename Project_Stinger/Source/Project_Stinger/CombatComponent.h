@@ -25,6 +25,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool Aiming);
 
+	void Fire();
+
 private:
 
 	class AStingerCharacter* Character;
