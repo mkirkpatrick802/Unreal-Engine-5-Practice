@@ -192,10 +192,22 @@ void AStingerCharacter::ToggleAim(const FInputActionValue& Value)
 		GetCharacterMovement()->bOrientRotationToMovement = !Combat->IsAiming;
 		ServerUpdateControlRotation(Combat->IsAiming);
 
+		FTimerHandle Handle;
+		FTimerDelegate Zoom;
+
 		CameraBoom->TargetArmLength = Combat->IsAiming ? 200 : 500;
+		//GetWorldTimerManager().SetTimer(Handle, this, &AStingerCharacter::LerpAim, 0.1f, true);
 		CameraBoom->SocketOffset.Y = Combat->IsAiming ? 80 : 0;
 		CameraBoom->SocketOffset.Z = Combat->IsAiming ? 80 : 40;
 	}
+}
+
+void AStingerCharacter::LerpAim() 
+{
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString("Done"));
+
+	//CameraBoom->TargetArmLength = FMath::Lerp(200, 500, 10);
 }
 
 void AStingerCharacter::ServerUpdateControlRotation_Implementation(bool SetControlRotationYaw)
