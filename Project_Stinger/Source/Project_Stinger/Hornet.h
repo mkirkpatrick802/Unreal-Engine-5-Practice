@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "Hornet.generated.h"
 
+class Octree;
 class USphereComponent;
 class UArrowComponent;
 
@@ -25,6 +26,11 @@ public:
 	AHornet();
 	virtual void Tick(float DeltaTime) override;
 
+	// Setters
+	void SetTree(Octree* Tree);
+
+	// Getters
+	float GetColliderRadius() { return ColliderRadius; }
 
 protected:
 
@@ -45,11 +51,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Boid")
 	float VisionRadius;
 
-	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereComponent;
+	UPROPERTY(EditAnywhere, Category = "Boid")
+	float ColliderRadius = 100;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* StaticMesh;
+	USphereComponent* SphereCollider;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere)
 	UArrowComponent* Arrow;
@@ -68,4 +77,6 @@ private:
 	UPROPERTY()
 	FVector Velocity;
 
+	// Used for finding neighbors
+	Octree* HornetOctree;
 };

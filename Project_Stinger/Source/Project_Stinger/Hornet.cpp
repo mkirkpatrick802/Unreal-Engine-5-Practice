@@ -1,5 +1,6 @@
 #include "Hornet.h"
 
+#include "Octree.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -7,17 +8,18 @@ AHornet::AHornet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
-	SphereComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	SetRootComponent(SphereComponent);
+	SphereCollider = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
+	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	SphereCollider->SetSphereRadius(ColliderRadius);
+	SetRootComponent(SphereCollider);
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Static Mesh"));
-	StaticMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Mesh"));
+	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	/*Arrow = CreateDefaultSubobject<UArrowComponent>(FName("Forward Arrow"));
+	Arrow = CreateDefaultSubobject<UArrowComponent>(FName("Forward Arrow"));
 	Arrow->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	Arrow->ArrowSize = 1.5;
-	Arrow->ArrowLength = 100;*/
+	Arrow->ArrowLength = 100;
 }
 
 void AHornet::BeginPlay()
@@ -28,6 +30,12 @@ void AHornet::BeginPlay()
 	Velocity = FVector(1,1,1);
 }
 
+void AHornet::SetTree(Octree* Tree)
+{
+	HornetOctree = Tree;
+	HornetOctree->Insert(this);
+}
+
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -35,6 +43,7 @@ void AHornet::Tick(float DeltaTime)
 	UpdateNeighbourhood();
 	UpdateTransform();
 
+	HornetOctree->DrawDebug(GetWorld());
 	DrawDebug();
 }
 
