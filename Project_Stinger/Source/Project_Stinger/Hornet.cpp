@@ -33,16 +33,17 @@ void AHornet::BeginPlay()
 void AHornet::SetTree(Octree* Tree)
 {
 	HornetOctree = Tree;
-	HornetOctree->Insert(this);
 }
 
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Movement
 	UpdateNeighbourhood();
 	UpdateTransform();
 
+	// Debug
 	HornetOctree->DrawDebug(GetWorld());
 	DrawDebug();
 }

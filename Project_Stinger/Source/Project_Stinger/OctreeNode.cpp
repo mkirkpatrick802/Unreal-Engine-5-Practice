@@ -1,15 +1,36 @@
 #include "OctreeNode.h"
 
 #include "Hornet.h"
+#include "OctreeLeaf.h"
 
 OctreeNode::OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octree*>& Children)
 {
 	this->Center = Center;
-	this->Children = Children;
     this->HalfWidth = HalfWidth;
+	this->Children = Children;
+
+    const float Temp = HalfWidth / 2;
+	for (int i = 0; i < 8; i++)
+	{
+		if(OctreeLeaf* Leaf = static_cast<OctreeLeaf*>(Children[i]))
+		{
+            FVector Offset = Center;
+
+            //Move offset up on X axis if it has the first bit assigned, down if not
+            Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? Temp : -Temp);
+
+            //Move offset up on Y axis if it has the second bit assigned, down if not
+            Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? Temp : -Temp);
+
+            //Move offset up on the Z axis if it has the third bit assigned, down if not
+            Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? Temp : -Temp);
+
+            Leaf->SetCenter(Offset);
+		}
+	}
 }
 
-void OctreeNode::Insert(AHornet* Hornet)
+void OctreeNode::Insert(AHornet* Hornet) // TODO: Not 100% Accurate (The Absolute Index Is Working)
 {
 	/*
     *

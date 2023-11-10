@@ -7,6 +7,9 @@
 
 AStingerGameMode::AStingerGameMode()
 {
+
+	PrimaryActorTick.bCanEverTick = true;
+
 	//Sets default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Project_Stinger/Blueprints/BP_StingerCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
@@ -24,5 +27,16 @@ void AStingerGameMode::BeginPlay()
 	for (AHornet* Hornet : TActorRange<AHornet>(GetWorld()))
 	{
 		Hornet->SetTree(HornetOctree);
+	}
+}
+
+void AStingerGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	HornetOctree->Clear();
+	for (AHornet* Hornet : TActorRange<AHornet>(GetWorld()))
+	{
+		HornetOctree->Insert(Hornet);
 	}
 }
