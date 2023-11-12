@@ -75,7 +75,7 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
 	int AxisOffset = 0;
     for (int i = 0; i < 3; i++)
     {
-        if (Hornet->GetColliderRadius() > FMath::Abs(Difference[i]))
+        if (Hornet->GetVisionRadius() > FMath::Abs(Difference[i]))
             AxisOffset += (1 << i);
     }
 
@@ -90,23 +90,24 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
             Children[BaseZone ^ 1 << i]->Insert(Hornet);
     }
 
-    // Use the Pythagorean Theorem to tell if the sphere is overlapping the diagonal axis
-    for (int i = 0; i < 3; ++i)
+    if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0)
     {
-        const float LegA = Difference[i];
-        const float LegASquared = FMath::Square(LegA);
+        Children[BaseZone ^ 3]->Insert(Hornet);
+    }
 
-        for (int j = i + 1; j < 3; ++j)
-        {
-            const float LegB = Difference[j];
-            const float LegBSquared = FMath::Square(LegB);
-            const float HypotenuseSquared = LegASquared + LegBSquared;
+    if ((AxisOffset & 1) != 0 && (AxisOffset & 4) != 0)
+    {
+        Children[BaseZone ^ 5]->Insert(Hornet);
+    }
 
-            if (FMath::Square(Hornet->GetColliderRadius()) > HypotenuseSquared)
-            {
-                Children[BaseZone ^ (1 << i) + (1 << j)]->Insert(Hornet);
-            }
-        }
+    if ((AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+    {
+        Children[BaseZone ^ 6]->Insert(Hornet);
+    }
+
+    if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+    {
+        Children[BaseZone ^ 7]->Insert(Hornet);
     }
 }
 
@@ -116,6 +117,8 @@ void OctreeNode::Clear()
     {
         Children[i]->Clear();
     }
+
+    IsEmpty = true;
 }
 
 void OctreeNode::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)

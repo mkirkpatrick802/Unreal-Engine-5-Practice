@@ -22,7 +22,10 @@ private:
 
 	Octree* HornetOctree;
 
+	UPROPERTY(EditAnywhere)
+	float OctreeHalfWidth = 10000;
+
+	UPROPERTY(EditAnywhere)
+	float OctreeDepth = 3;
+
 };
-
-
-

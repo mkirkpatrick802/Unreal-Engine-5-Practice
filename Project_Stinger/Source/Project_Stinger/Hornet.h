@@ -31,6 +31,7 @@ public:
 
 	// Getters
 	float GetColliderRadius() { return ColliderRadius; }
+	float GetVisionRadius() { return VisionRadius; }
 
 protected:
 
@@ -49,7 +50,7 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
-	float VisionRadius;
+	float VisionRadius = 200;
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
 	float ColliderRadius = 75;

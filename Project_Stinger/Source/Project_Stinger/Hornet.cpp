@@ -50,7 +50,8 @@ void AHornet::Tick(float DeltaTime)
 
 void AHornet::UpdateNeighbourhood()
 {
-
+	Neighborhood.Empty();
+	HornetOctree->GetNeighbors(Neighborhood, this);
 }
 
 void AHornet::UpdateTransform()
@@ -63,6 +64,17 @@ void AHornet::UpdateTransform()
 void AHornet::DrawDebug() const
 {
 	const UWorld* World = GetWorld();
-	const FVector& Location = Transform.GetLocation();
+	const FVector& Location = GetActorLocation();
+
+	// Movement Vector
 	DrawDebugLine(World, Location,Location + Velocity * 100.0f, FColor::Green, false, -1, 0, 1.0f);
+
+	// Vision Radius
+	DrawDebugSphere(World, GetActorLocation(), VisionRadius, 20, FColor::Blue, false, -1, 0, .2f);
+
+	//Draw Connections to Neighbors
+	for (const auto Hornet : Neighborhood)
+	{
+		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 3);
+	}
 }
