@@ -52,7 +52,7 @@ protected:
 	float VisionRadius;
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
-	float ColliderRadius = 100;
+	float ColliderRadius = 75;
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereCollider;

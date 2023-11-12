@@ -27,7 +27,7 @@ void AHornet::BeginPlay()
 	Super::BeginPlay();
 
 	Transform = GetActorTransform();
-	Velocity = FVector(1,1,1);
+	Velocity = FVector(1,0,1);
 }
 
 void AHornet::SetTree(Octree* Tree)
@@ -57,7 +57,7 @@ void AHornet::UpdateTransform()
 {
 	Transform.SetLocation(Transform.GetLocation() + Velocity);
 	Transform.SetRotation(Velocity.ToOrientationQuat());
-	SetActorTransform(Transform);
+	//SetActorTransform(Transform);
 }
 
 void AHornet::DrawDebug() const

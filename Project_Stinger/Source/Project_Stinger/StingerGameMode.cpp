@@ -17,7 +17,7 @@ AStingerGameMode::AStingerGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	HornetOctree = Octree::Create(FVector(0, 0, 5000), 5000, 3);
+	HornetOctree = Octree::Create(FVector(0, 0, 1000), 1000, 2);
 }
 
 void AStingerGameMode::BeginPlay()

@@ -30,7 +30,7 @@ OctreeNode::OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octr
 	}
 }
 
-void OctreeNode::Insert(AHornet* Hornet) // TODO: Not 100% Accurate (The Absolute Index Is Working)
+void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different nodes the hornet is passed into unnecessary leafs
 {
 	/*
     *
@@ -51,52 +51,61 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: Not 100% Accurate (The Absolut
     *
     */
 
-	//Get the child that is absolutely holding the sphere
-    int baseZone = 0;
+	// Get the child that is absolutely holding the sphere
+    int BaseZone = 0;
     for (int i = 0; i < 3; i++)
     {
         if (Hornet->GetActorLocation()[i] > Center[i])
         {
-            //Shifts the binary number to the left in respect to i:
-            //the result will either be 1, 2, 4
-            baseZone += (1 << i);
+            // Shifts the binary number to the left in respect to i:
+            // the result will either be 1, 2, 4
+            BaseZone += (1 << i);
         }
     }
 
-    //Add the sphere to the absolute child
-    Children[baseZone]->Insert(Hornet);
+    // Add the sphere to the absolute child
+    Children[BaseZone]->Insert(Hornet);
 
-    //Get how far away the sphere is from the center of the octree
-    FVector difference = Hornet->GetActorLocation() - Center;
+    // Get how far away the sphere is from the center of the octree
+    const FVector Difference = Hornet->GetActorLocation() - Center;
 
-    //Check the difference with the sphere radius, if the radius is larger,
-    //then the sphere is bleeding into another child
-    int offset = 0; //Offset is used to hold which children are occupied
+    // Check the difference with the sphere radius, if the radius is larger,
+    // then the sphere is bleeding into another child
+    // Offset is used to hold which children are occupied
+	int AxisOffset = 0;
     for (int i = 0; i < 3; i++)
     {
-        if (Hornet->GetColliderRadius() > FMath::Abs(difference[i]))
-        {
-            offset += (1 << i);
-        }
+        if (Hornet->GetColliderRadius() > FMath::Abs(Difference[i]))
+            AxisOffset += (1 << i);
     }
 
-    //If offset is less then one, then no other children contain this sphere
-    if (offset < 1) return;
+    // If offset is less then one, then no other children contain this sphere
+    if (AxisOffset < 1) return;
 
-    //Cycle through all remaining children and see if the radius is bleeding into them using the calculated offset
-    for (int i = 0; i < 8; i++)
+    // Use the offset to determine what children the sphere is overlapping into
+    // This only accounts for 3 possible overlaps (the x, y and z axis)
+    for (int i = 0; i < 3; i++)
     {
-        if (i == baseZone) continue;
-        if (i > offset) continue;
+        if ((AxisOffset & 1 << i) != 0)
+            Children[BaseZone ^ 1 << i]->Insert(Hornet);
+    }
 
-        //Compares the bits of offset and i to see if i is contained in offset.
-        //If it is then that means baseZone - i is occupied.
-        //If offset is 7 then all children are occupied.
-        //If offset is 6 then the 4th and 2nd children are occupied
-        //If offset is 4 then only the 4th child is occupied.
-        if (((offset & i) == i && i != 0) || (offset == 7 && i == 0))
+    // Use the Pythagorean Theorem to tell if the sphere is overlapping the diagonal axis
+    for (int i = 0; i < 3; ++i)
+    {
+        const float LegA = Difference[i];
+        const float LegASquared = FMath::Square(LegA);
+
+        for (int j = i + 1; j < 3; ++j)
         {
-            Children[i]->Insert(Hornet);
+            const float LegB = Difference[j];
+            const float LegBSquared = FMath::Square(LegB);
+            const float HypotenuseSquared = LegASquared + LegBSquared;
+
+            if (FMath::Square(Hornet->GetColliderRadius()) > HypotenuseSquared)
+            {
+                Children[BaseZone ^ (1 << i) + (1 << j)]->Insert(Hornet);
+            }
         }
     }
 }
