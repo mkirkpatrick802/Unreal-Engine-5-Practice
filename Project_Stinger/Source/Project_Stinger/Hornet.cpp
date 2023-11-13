@@ -11,6 +11,7 @@ AHornet::AHornet()
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
 	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SphereCollider->SetSphereRadius(ColliderRadius);
+	SphereCollider->SetMobility(EComponentMobility::Movable);
 	SetRootComponent(SphereCollider);
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Mesh"));
@@ -44,7 +45,6 @@ void AHornet::Tick(float DeltaTime)
 	UpdateTransform();
 
 	// Debug
-	HornetOctree->DrawDebug(GetWorld());
 	DrawDebug();
 }
 

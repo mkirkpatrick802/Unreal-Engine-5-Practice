@@ -30,8 +30,8 @@ public:
 	void SetTree(Octree* Tree);
 
 	// Getters
-	float GetColliderRadius() { return ColliderRadius; }
-	float GetVisionRadius() { return VisionRadius; }
+	float GetColliderRadius() const { return ColliderRadius; }
+	float GetVisionRadius() const { return VisionRadius; }
 
 protected:
 

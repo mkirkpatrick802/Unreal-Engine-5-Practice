@@ -12,10 +12,12 @@ public:
 
     void SetCenter(const FVector& New) { Center = New; }
     virtual void Insert(AHornet* Hornet) override;
+    virtual int GetNumberOfContents() override;
     virtual void Clear() override;
-    virtual void GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet) override;
-    virtual void DrawDebug(const UWorld* World) override;
 
+    virtual void GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet) override;
+
+    virtual void DrawDebug(const UWorld* World) override;
 private:
 
 	FVector Center;

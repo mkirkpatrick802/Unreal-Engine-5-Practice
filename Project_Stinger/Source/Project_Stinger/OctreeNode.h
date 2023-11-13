@@ -12,8 +12,11 @@ public:
 
     OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octree*>& Children);
     virtual void Insert(AHornet* Hornet) override;
+    virtual int GetNumberOfContents() override;
     virtual void Clear() override;
+
     virtual void GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet) override;
+
     virtual void DrawDebug(const UWorld* World) override;
 
 private:

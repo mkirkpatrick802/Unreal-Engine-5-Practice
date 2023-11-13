@@ -30,7 +30,7 @@ OctreeNode::OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octr
 	}
 }
 
-void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different nodes the hornet is passed into unnecessary leafs
+void OctreeNode::Insert(AHornet* Hornet)
 {
 	/*
     *
@@ -51,11 +51,14 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
     *
     */
 
+    // HornetsLocation
+    FVector HornetLocation = Hornet->GetActorLocation();
+
 	// Get the child that is absolutely holding the sphere
     int BaseZone = 0;
     for (int i = 0; i < 3; i++)
     {
-        if (Hornet->GetActorLocation()[i] > Center[i])
+        if (HornetLocation[i] > Center[i])
         {
             // Shifts the binary number to the left in respect to i:
             // the result will either be 1, 2, 4
@@ -67,7 +70,7 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
     Children[BaseZone]->Insert(Hornet);
 
     // Get how far away the sphere is from the center of the octree
-    const FVector Difference = Hornet->GetActorLocation() - Center;
+    const FVector Difference = HornetLocation - Center;
 
     // Check the difference with the sphere radius, if the radius is larger,
     // then the sphere is bleeding into another child
@@ -90,6 +93,7 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
             Children[BaseZone ^ 1 << i]->Insert(Hornet);
     }
 
+    // Calculate diagonal overlaps
     if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0)
     {
         Children[BaseZone ^ 3]->Insert(Hornet);
@@ -109,6 +113,23 @@ void OctreeNode::Insert(AHornet* Hornet) // TODO: When testing across different 
     {
         Children[BaseZone ^ 7]->Insert(Hornet);
     }
+
+    // Check content size to see if a shrinking is 
+    if(GetNumberOfContents() < RESIZE_THRESHOLD)
+    {
+        // Change this node to become a leaf
+    }
+}
+
+int OctreeNode::GetNumberOfContents()
+{
+    int NumContents = 0;
+    for(int i = 0; i < 8; i++)
+    {
+        NumContents += Children[i]->GetNumberOfContents();
+    }
+
+    return NumContents;
 }
 
 void OctreeNode::Clear()

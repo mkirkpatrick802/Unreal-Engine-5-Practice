@@ -17,7 +17,7 @@ AStingerGameMode::AStingerGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	HornetOctree = Octree::Create(FVector(0, 0, OctreeHalfWidth), OctreeHalfWidth, OctreeDepth);
+	HornetOctree = Octree::Create(FVector(0, 0, OctreeStartingHalfWidth), OctreeStartingHalfWidth);
 }
 
 void AStingerGameMode::BeginPlay()
@@ -43,7 +43,9 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 	HornetOctree->Clear();
 	for (AHornet* Hornet : Hornets)
 	{
-		// TODO: This is extremely slow
-		//HornetOctree->Insert(Hornet);
+		HornetOctree->Insert(Hornet);
 	}
+
+	HornetOctree->DrawDebug(GetWorld());
+
 }

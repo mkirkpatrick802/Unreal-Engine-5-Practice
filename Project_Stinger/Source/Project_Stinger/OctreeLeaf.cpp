@@ -7,6 +7,11 @@ void OctreeLeaf::Insert(AHornet* Hornet)
 	Hornets.Add(Hornet);
 }
 
+int OctreeLeaf::GetNumberOfContents()
+{
+	return Hornets.Num();
+}
+
 void OctreeLeaf::Clear()
 {
 	Hornets.Empty();
