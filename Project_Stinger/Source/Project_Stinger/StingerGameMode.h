@@ -4,6 +4,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "StingerGameMode.generated.h"
 
+class AHornet;
 class Octree;
 
 UCLASS(minimalapi)
@@ -21,6 +22,9 @@ public:
 private:
 
 	Octree* HornetOctree;
+
+	UPROPERTY()
+	TArray<AHornet*> Hornets;
 
 	UPROPERTY(EditAnywhere)
 	float OctreeHalfWidth = 10000;

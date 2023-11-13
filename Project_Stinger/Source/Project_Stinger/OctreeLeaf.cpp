@@ -5,18 +5,16 @@
 void OctreeLeaf::Insert(AHornet* Hornet)
 {
 	Hornets.Add(Hornet);
-	IsEmpty = false;
 }
 
 void OctreeLeaf::Clear()
 {
 	Hornets.Empty();
-	IsEmpty = true;
 }
 
 void OctreeLeaf::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 {
-	if(IsEmpty) return;
+	if(Hornets.IsEmpty()) return;
 	if(!Hornets.Contains(Hornet)) return;
 
 	FVector HornetLoc = Hornet->GetActorLocation();
@@ -35,7 +33,7 @@ void OctreeLeaf::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 
 void OctreeLeaf::DrawDebug(const UWorld* World)
 {
-	if(IsEmpty) return;
+	if(Hornets.IsEmpty()) return;
 
 	DrawDebugSphere(World, Center, 200, 20, FColor::Blue, false, -1, 0, 5);
 }

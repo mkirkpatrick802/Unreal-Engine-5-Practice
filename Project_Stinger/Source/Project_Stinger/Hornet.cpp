@@ -70,7 +70,7 @@ void AHornet::DrawDebug() const
 	DrawDebugLine(World, Location,Location + Velocity * 100.0f, FColor::Green, false, -1, 0, 1.0f);
 
 	// Vision Radius
-	DrawDebugSphere(World, GetActorLocation(), VisionRadius, 20, FColor::Blue, false, -1, 0, .2f);
+	//DrawDebugSphere(World, GetActorLocation(), VisionRadius, 15, FColor::Blue, false, -1, 0, .5f);
 
 	//Draw Connections to Neighbors
 	for (const auto Hornet : Neighborhood)

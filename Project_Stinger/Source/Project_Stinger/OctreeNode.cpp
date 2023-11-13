@@ -117,8 +117,6 @@ void OctreeNode::Clear()
     {
         Children[i]->Clear();
     }
-
-    IsEmpty = true;
 }
 
 void OctreeNode::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)

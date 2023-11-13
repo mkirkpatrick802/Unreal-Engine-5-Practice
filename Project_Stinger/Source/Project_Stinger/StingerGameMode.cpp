@@ -28,6 +28,12 @@ void AStingerGameMode::BeginPlay()
 	{
 		Hornet->SetTree(HornetOctree);
 	}
+
+	for (AHornet* Hornet : TActorRange<AHornet>(GetWorld()))
+	{
+		Hornets.AddUnique(Hornet);
+	}
+
 }
 
 void AStingerGameMode::Tick(float DeltaSeconds)
@@ -35,8 +41,9 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	HornetOctree->Clear();
-	for (AHornet* Hornet : TActorRange<AHornet>(GetWorld()))
+	for (AHornet* Hornet : Hornets)
 	{
-		HornetOctree->Insert(Hornet);
+		// TODO: This is extremely slow
+		//HornetOctree->Insert(Hornet);
 	}
 }
