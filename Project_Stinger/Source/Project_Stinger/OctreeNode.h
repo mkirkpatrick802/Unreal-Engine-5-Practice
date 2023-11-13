@@ -10,7 +10,7 @@ class PROJECT_STINGER_API OctreeNode : public Octree
 {
 public:
 
-    OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octree*>& Children);
+    OctreeNode(const FVector& Center, float HalfWidth, int Depth, const TArray<Octree*>& Children);
     virtual void Insert(AHornet* Hornet) override;
     virtual int GetNumberOfContents() override;
     virtual void Clear() override;

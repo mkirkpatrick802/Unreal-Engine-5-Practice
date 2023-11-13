@@ -20,5 +20,14 @@ public:
 
 	virtual void DrawDebug(const UWorld* World) = 0;
 
-	const int RESIZE_THRESHOLD = 5;
+	const int GROW_THRESHOLD = 6;
+	const int SHRINK_THRESHOLD = 3;
+	const int MAX_DEPTH = 3;
+
+protected:
+
+	// This is the index for where this class is in the parents octree, ie if its 3 then its the third child for the parent node
+	// If Index is -1 then the node is the root and cannot shrink;
+	int Index = -1;
+	int CurrentDepth = 0;
 };

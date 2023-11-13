@@ -2,6 +2,11 @@
 
 #include "Hornet.h"
 
+OctreeLeaf::OctreeLeaf()
+{
+
+}
+
 void OctreeLeaf::Insert(AHornet* Hornet)
 {
 	Hornets.Add(Hornet);

@@ -51,6 +51,6 @@ Octree* Octree::Create(FVector Center, float HalfWidth, int Depth)
             Children[i] = Create(Offset, HalfWidth, Depth - 1);
         }
 
-        return new OctreeNode(Center, HalfWidth * 2, Children);
+        return new OctreeNode(Center, HalfWidth * 2, Depth, Children);
     }
 }
