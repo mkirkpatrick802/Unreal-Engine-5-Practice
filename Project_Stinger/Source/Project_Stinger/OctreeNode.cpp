@@ -3,32 +3,54 @@
 #include "Hornet.h"
 #include "OctreeLeaf.h"
 
-OctreeNode::OctreeNode(const FVector& Center, float HalfWidth, int Depth, const TArray<Octree*>& Children)
+OctreeNode::OctreeNode(const FVector& Center, float HalfWidth)
 {
+    Type = Node;
+    this->Center = Center;
+    this->HalfWidth = HalfWidth;
+    Children.SetNum(8);
+
+    const float Temp = HalfWidth / 2;
+;   for (int i = 0; i < 8; i++)
+    {
+        FVector Offset = Center;
+
+        //Move offset up on X axis if it has the first bit assigned, down if not
+        Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? Temp : -Temp);
+
+        //Move offset up on Y axis if it has the second bit assigned, down if not
+        Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? Temp : -Temp);
+
+        //Move offset up on the Z axis if it has the third bit assigned, down if not
+        Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? Temp : -Temp);
+
+        //Add Child to List
+        Children[i] = new OctreeLeaf(Offset);
+    }
+
+	Setup();
+}
+
+OctreeNode::OctreeNode(const FVector& Center, float HalfWidth, const TArray<Octree*>& Children)
+{
+    Type = Node;
 	this->Center = Center;
     this->HalfWidth = HalfWidth;
 	this->Children = Children;
-    this->CurrentDepth = Depth;
 
-    const float Temp = HalfWidth / 2;
-	for (int i = 0; i < 8; i++)
-	{
-		if(OctreeLeaf* Leaf = static_cast<OctreeLeaf*>(Children[i]))
-		{
-            FVector Offset = Center;
+    Setup();
+}
 
-            //Move offset up on X axis if it has the first bit assigned, down if not
-            Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? Temp : -Temp);
-
-            //Move offset up on Y axis if it has the second bit assigned, down if not
-            Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? Temp : -Temp);
-
-            //Move offset up on the Z axis if it has the third bit assigned, down if not
-            Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? Temp : -Temp);
-
-            Leaf->SetCenter(Offset);
-		}
-	}
+void OctreeNode::Setup()
+{
+    if(Type == Root)
+    {
+        CurrentDepth = 1;
+        for (int i = 0; i < 8; i++)
+        {
+            Children[i]->SetDepth(CurrentDepth);
+        }
+    }
 }
 
 void OctreeNode::Insert(AHornet* Hornet)
@@ -84,106 +106,127 @@ void OctreeNode::Insert(AHornet* Hornet)
     }
 
     // If offset is less then one, then no other children contain this sphere
-    if (AxisOffset < 1) return;
-
-    // Use the offset to determine what children the sphere is overlapping into
-    // This only accounts for 3 possible overlaps (the x, y and z axis)
-    for (int i = 0; i < 3; i++)
+    if (AxisOffset > 0)
     {
-        if ((AxisOffset & 1 << i) != 0)
-            Children[BaseZone ^ 1 << i]->Insert(Hornet);
-    }
-
-    // Calculate diagonal overlaps
-    if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0)
-    {
-        Children[BaseZone ^ 3]->Insert(Hornet);
-    }
-
-    if ((AxisOffset & 1) != 0 && (AxisOffset & 4) != 0)
-    {
-        Children[BaseZone ^ 5]->Insert(Hornet);
-    }
-
-    if ((AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
-    {
-        Children[BaseZone ^ 6]->Insert(Hornet);
-    }
-
-    if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
-    {
-        Children[BaseZone ^ 7]->Insert(Hornet);
-    }
-
-    // Check content size to see if it should be resized 
-    if(GetNumberOfContents() < SHRINK_THRESHOLD)
-    {
-        if(CurrentDepth == 0) return;
-        // Change this node to become a leaf if its not the root node
-    }
-    else
-    {
-	    // Create a new node
-        if(CurrentDepth + 1 > MAX_DEPTH) return;
-
-        for (int i = 0; i < 8; i++)
+        // Use the offset to determine what children the sphere is overlapping into
+		// This only accounts for 3 possible overlaps (the x, y and z axis)
+        for (int i = 0; i < 3; i++)
         {
-	        if(Children[i]->GetNumberOfContents() > GROW_THRESHOLD)
-	        {
+            if ((AxisOffset & 1 << i) != 0)
+                Children[BaseZone ^ 1 << i]->Insert(Hornet);
+        }
 
-                if (OctreeLeaf* Leaf = static_cast<OctreeLeaf*>(Children[i]))
-                {
+        // Calculate diagonal overlaps
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0)
+        {
+            Children[BaseZone ^ 3]->Insert(Hornet);
+        }
 
-                    if (GEngine)
-                    {
-                        GEngine->AddOnScreenDebugMessage(
-                            -1,
-                            15.f,
-                            FColor::Green,
-                            FString::Printf(TEXT("Resize"))
-                        );
-                    }
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 5]->Insert(Hornet);
+        }
 
-                    TArray<AHornet*> TempHornets = Leaf->GetHornetArray();
-                    delete Leaf;
+        if ((AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 6]->Insert(Hornet);
+        }
 
-                    float Temp = HalfWidth / 2;
-                    TArray<Octree*> NewChildren;
-                    NewChildren.SetNum(8);
-
-                    FVector Offset = Center;
-
-                    //Move offset up on X axis if it has the first bit assigned, down if not
-                    Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? HalfWidth : -HalfWidth);
-
-                    //Move offset up on Y axis if it has the second bit assigned, down if not
-                    Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? HalfWidth : -HalfWidth);
-
-                    //Move offset up on the Z axis if it has the third bit assigned, down if not
-                    Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? HalfWidth : -HalfWidth);
-
-                    for (int j = 0; j < 8; j++)
-                    {
-                        //Add Child to List
-                        NewChildren[j] = new OctreeLeaf();
-                    }
-
-                    Children[i] = new OctreeNode(Offset, Temp, CurrentDepth + 1, NewChildren);
-                }
-	        }
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 7]->Insert(Hornet);
         }
     }
 }
 
-int OctreeNode::GetNumberOfContents()
+
+void OctreeNode::Resize()
 {
-    int NumContents = 0;
+
     for(int i = 0; i < 8; i++)
     {
-        NumContents += Children[i]->GetNumberOfContents();
+        if(Children[i]->GetHornets().Num() > RESIZE_THRESHOLD)
+        {
+            if(CurrentDepth + 1 > MAX_DEPTH) return;
+
+        	Octree* Child = Children[i];
+            if (Child->Type != Leaf) continue;
+
+            TArray<AHornet*> HornetsToMove;
+        	{
+                OctreeLeaf* TempLeaf = static_cast<OctreeLeaf*>(Child);
+                HornetsToMove = TempLeaf->GetHornets();
+        	}
+
+        	const float Temp = HalfWidth / 2;
+        	FVector Offset = Center;
+
+        	//Move offset up on X axis if it has the first bit assigned, down if not
+        	Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? Temp : -Temp);
+
+        	//Move offset up on Y axis if it has the second bit assigned, down if not
+        	Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? Temp : -Temp);
+
+        	//Move offset up on the Z axis if it has the third bit assigned, down if not
+        	Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? Temp : -Temp);
+
+        	Children[i] = new OctreeNode(Offset, Temp);
+            Children[i]->SetDepth(CurrentDepth);
+
+	        for (const auto ToMove : HornetsToMove)
+	        {
+                Children[i]->Insert(ToMove);
+	        }
+
+            delete Child;
+
+            continue;
+        }
+
+        if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
+        {
+            Octree* Child = Children[i];
+
+            if (Child->Type != Node) return;
+
+            const float Temp = HalfWidth / 2;
+            FVector Offset = Center;
+
+            //Move offset up on X axis if it has the first bit assigned, down if not
+            Offset += FVector(1, 0, 0) * ((i & 1) != 0 ? Temp : -Temp);
+
+            //Move offset up on Y axis if it has the second bit assigned, down if not
+            Offset += FVector(0, 1, 0) * ((i & 2) != 0 ? Temp : -Temp);
+
+            //Move offset up on the Z axis if it has the third bit assigned, down if not
+            Offset += FVector(0, 0, 1) * ((i & 4) != 0 ? Temp : -Temp);
+
+            Children[i] = new OctreeLeaf(Offset);
+
+            delete Child;
+        }
     }
 
-    return NumContents;
+    for (int i = 0; i < 8; i++)
+    {
+        Children[i]->Resize();
+    }
+}
+
+
+TArray<AHornet*> OctreeNode::GetHornets()
+{
+    TArray<AHornet*> UniqueHornets;
+
+    for (int i = 0; i < 8; i++)
+    {
+	    for (auto Hornet : Children[i]->GetHornets())
+	    {
+            UniqueHornets.AddUnique(Hornet);
+	    }
+    }
+
+    return UniqueHornets;
 }
 
 void OctreeNode::Clear()

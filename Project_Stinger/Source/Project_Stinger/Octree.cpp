@@ -3,11 +3,11 @@
 #include "OctreeLeaf.h"
 #include "OctreeNode.h"
 
-Octree* Octree::Create(FVector Center, float HalfWidth, int Depth)
+Octree* Octree::Create(const FVector& Center, float HalfWidth, int Depth)
 {
     if (Depth == 0)
     {
-        return new OctreeLeaf();
+        return new OctreeLeaf(Center);
     }
     else
     {
@@ -51,6 +51,13 @@ Octree* Octree::Create(FVector Center, float HalfWidth, int Depth)
             Children[i] = Create(Offset, HalfWidth, Depth - 1);
         }
 
-        return new OctreeNode(Center, HalfWidth * 2, Depth, Children);
+        OctreeNode* Node = new OctreeNode(Center, HalfWidth * 2, Children);
+        if(!RootSet)
+        {
+            Node->Type = Root;
+            RootSet = true;
+        }
+
+        return Node;
     }
 }

@@ -4,17 +4,18 @@
 
 OctreeLeaf::OctreeLeaf()
 {
+	Type = Leaf;
+}
 
+OctreeLeaf::OctreeLeaf(const FVector& New)
+{
+	Type = Leaf;
+	Center = New;
 }
 
 void OctreeLeaf::Insert(AHornet* Hornet)
 {
 	Hornets.Add(Hornet);
-}
-
-int OctreeLeaf::GetNumberOfContents()
-{
-	return Hornets.Num();
 }
 
 void OctreeLeaf::Clear()
@@ -41,9 +42,19 @@ void OctreeLeaf::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 	}
 }
 
+TArray<AHornet*> OctreeLeaf::GetHornets()
+{
+	return Hornets;
+}
+
 void OctreeLeaf::DrawDebug(const UWorld* World)
 {
 	if(Hornets.IsEmpty()) return;
 
 	DrawDebugSphere(World, Center, 200, 20, FColor::Blue, false, -1, 0, 5);
+}
+
+void OctreeLeaf::Resize()
+{
+
 }

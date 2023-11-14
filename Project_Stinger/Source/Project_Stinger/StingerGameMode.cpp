@@ -46,6 +46,6 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 		HornetOctree->Insert(Hornet);
 	}
 
+	HornetOctree->Resize();
 	HornetOctree->DrawDebug(GetWorld());
-
 }
