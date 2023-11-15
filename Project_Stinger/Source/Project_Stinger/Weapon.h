@@ -15,6 +15,7 @@ public:
 
 	AWeapon();
 	virtual void Tick(float DeltaTime) override;
+	virtual void Fire(const FVector& HitTarget);
 
 protected:
 
@@ -24,6 +25,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	class UAnimationAsset* FireAnimation;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AProjectile> ProjectileClass;
 
 public:	
 

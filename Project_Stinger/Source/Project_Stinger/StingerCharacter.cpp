@@ -197,8 +197,8 @@ void AStingerCharacter::ToggleAim(const FInputActionValue& Value)
 
 		CameraBoom->TargetArmLength = Combat->IsAiming ? 200 : 500;
 		//GetWorldTimerManager().SetTimer(Handle, this, &AStingerCharacter::LerpAim, 0.1f, true);
-		CameraBoom->SocketOffset.Y = Combat->IsAiming ? 80 : 0;
-		CameraBoom->SocketOffset.Z = Combat->IsAiming ? 80 : 40;
+		CameraBoom->SocketOffset.Y = Combat->IsAiming ? 80 : 75;
+		CameraBoom->SocketOffset.Z = Combat->IsAiming ? 80 : 75;
 	}
 }
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Octree.h"
 #include "GameFramework/GameModeBase.h"
 #include "StingerGameMode.generated.h"
 
 class AHornet;
-class Octree;
 
 UCLASS(minimalapi)
 class AStingerGameMode : public AGameModeBase

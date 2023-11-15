@@ -50,6 +50,8 @@ void AHornet::Tick(float DeltaTime)
 
 void AHornet::UpdateNeighbourhood()
 {
+	if(!HornetOctree) return;
+
 	Neighborhood.Empty();
 	HornetOctree->GetNeighbors(Neighborhood, this);
 }
