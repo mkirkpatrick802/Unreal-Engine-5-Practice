@@ -98,6 +98,10 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	// Set Current Weapon
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon(AWeapon* Weapon);
+
 public:
 
 	/** Returns CameraBoom subobject **/
@@ -110,14 +114,12 @@ public:
 
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 
-	AWeapon* GetEquippedWeapon();
+	UFUNCTION(BlueprintCallable)
+	AWeapon* GetEquippedWeapon() const;
 
-	bool IsAiming();
+	bool IsAiming() const;
 
 protected:
-
-	UPROPERTY(BlueprintReadWrite)
-	AWeapon* EquipWeapon;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* FireWeaponMontage;
@@ -126,5 +128,8 @@ private:
 	float AO_Pitch;
 	float AO_Yaw;
 	ETurningInPlace TurningInPlace;
+
+	UPROPERTY()
+	AWeapon* EquipWeapon;
 
 };

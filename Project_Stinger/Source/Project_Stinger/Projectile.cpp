@@ -32,20 +32,37 @@ void AProjectile::BeginPlay()
 	}
 }
 
+void AProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(ImpactParticles)
+	// TODO: Apply Damage
+	ServerOnHit();
+	Destroy();
+}
+
+void AProjectile::ServerOnHit_Implementation()
+{
+	MulticastOnHit();
+}
+
+void AProjectile::MulticastOnHit_Implementation()
+{
+	if (ImpactParticles)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
 	}
 
-	if(ImpactSound)
+	if (ImpactSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
 }
 
-void AProjectile::Tick(float DeltaTime)
+void AProjectile::Destroyed()
 {
-	Super::Tick(DeltaTime);
+	Super::Destroyed();
 }

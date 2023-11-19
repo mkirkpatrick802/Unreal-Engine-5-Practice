@@ -46,4 +46,7 @@ private:
 
 	UPROPERTY(Replicated)
 	bool IsAiming;
+
+	UPROPERTY()
+	AWeapon* CurrentWeapon;
 };

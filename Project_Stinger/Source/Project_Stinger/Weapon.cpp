@@ -26,15 +26,16 @@ void AWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AWeapon::Fire(const FVector& HitTarget)
+void AWeapon::FireWeapon()
 {
-	if(FireAnimation)
+	if (FireAnimation)
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 	}
+}
 
-	if (!HasAuthority()) return;
-
+void AWeapon::SpawnProjectile(const FVector& HitTarget)
+{
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 	const USkeletalMeshSocket* MuzzleFlashSocket = WeaponMesh->GetSocketByName(FName("Muzzle_Flash_Position"));
 	if(MuzzleFlashSocket)

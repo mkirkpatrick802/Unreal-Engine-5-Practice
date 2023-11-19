@@ -17,6 +17,7 @@ public:
 
 	AProjectile();
 	virtual void Tick(float DeltaTime) override;
+	virtual void Destroyed() override;
 
 protected:
 
@@ -24,6 +25,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(Server, Reliable)
+	void ServerOnHit();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastOnHit();
 
 public:
 private:

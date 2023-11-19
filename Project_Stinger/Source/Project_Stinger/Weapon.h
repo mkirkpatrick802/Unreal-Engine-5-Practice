@@ -13,7 +13,8 @@ public:
 
 	AWeapon();
 	virtual void Tick(float DeltaTime) override;
-	virtual void Fire(const FVector& HitTarget);
+	virtual void FireWeapon();
+	virtual void SpawnProjectile(const FVector& HitTarget);
 
 protected:
 

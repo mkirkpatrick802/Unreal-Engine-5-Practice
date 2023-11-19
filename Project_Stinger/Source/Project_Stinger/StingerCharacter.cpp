@@ -90,12 +90,18 @@ void AStingerCharacter::BeginPlay()
 	}
 }
 
-AWeapon* AStingerCharacter::GetEquippedWeapon()
+void AStingerCharacter::SetWeapon(AWeapon* Weapon)
+{
+	EquipWeapon = Weapon;
+	Combat->CurrentWeapon = Weapon;
+}
+
+AWeapon* AStingerCharacter::GetEquippedWeapon() const
 {
 	return EquipWeapon;
 }
 
-bool AStingerCharacter::IsAiming()
+bool AStingerCharacter::IsAiming() const
 {
 	return (Combat && Combat->IsAiming);
 }

@@ -47,17 +47,19 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
+	// Only spawn the projectile on the Server
+	if (CurrentWeapon == nullptr) return;
+	CurrentWeapon->SpawnProjectile(TraceHitTarget);
 	MulticastFire(TraceHitTarget);
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	AWeapon* CurrentWeapon = Character->GetEquippedWeapon();
-	if (CurrentWeapon == nullptr) return;
+	// Play The Weapon Animations on all clients
 	if (Character)
 	{
 		Character->PlayFireMontage();
-		CurrentWeapon->Fire(TraceHitTarget);
+		CurrentWeapon->FireWeapon();
 	}
 }
 
