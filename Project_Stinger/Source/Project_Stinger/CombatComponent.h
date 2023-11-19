@@ -6,6 +6,8 @@
 
 #define TRACE_LENGTH 80000
 
+class AStingerHUD;
+class AStingerPlayerController;
 class AWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,10 +41,18 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
+	void SetHUDCrosshairs(float DeltaTime);
+
 private:
 
 	UPROPERTY()
-	class AStingerCharacter* Character;
+	AStingerCharacter* Character;
+
+	UPROPERTY()
+	AStingerPlayerController* Controller;
+
+	UPROPERTY()
+	AStingerHUD* HUD;
 
 	UPROPERTY(Replicated)
 	bool IsAiming;

@@ -1,6 +1,8 @@
 #include "CombatComponent.h"
 
 #include "StingerCharacter.h"
+#include "StingerHUD.h"
+#include "StingerPlayerController.h"
 #include "Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -25,6 +27,41 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	SetHUDCrosshairs(DeltaTime);
+}
+
+
+void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
+{
+	if(Character == nullptr || Character->Controller == nullptr) return;
+
+	Controller = Controller == nullptr ? Cast<AStingerPlayerController>(Character->Controller) : Controller;
+	if (Controller)
+	{
+		HUD = HUD == nullptr ? Cast<AStingerHUD>(Controller->GetHUD()) : HUD;
+		if (HUD && CurrentWeapon)
+		{
+			FHUDPackage Package;
+			if(IsAiming)
+			{
+				Package.CrosshairsCenter = CurrentWeapon->CrosshairsCenter;
+				Package.CrosshairsLeft = CurrentWeapon->CrosshairsLeft;
+				Package.CrosshairsRight = CurrentWeapon->CrosshairsRight;
+				Package.CrosshairsBottom = CurrentWeapon->CrosshairsBottom;
+				Package.CrosshairsTop = CurrentWeapon->CrosshairsTop;
+			}
+			else
+			{
+				Package.CrosshairsCenter = nullptr;
+				Package.CrosshairsLeft = nullptr;
+				Package.CrosshairsRight = nullptr;
+				Package.CrosshairsBottom = nullptr;
+				Package.CrosshairsTop = nullptr;
+			}
+			HUD->SetHUDPackage(Package);
+		}
+	}
 }
 
 void UCombatComponent::ToggleAiming()
