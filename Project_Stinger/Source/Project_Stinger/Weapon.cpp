@@ -1,6 +1,7 @@
 #include "Weapon.h"
 
 #include "Projectile.h"
+#include "StingerCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 
 AWeapon::AWeapon()
@@ -32,15 +33,31 @@ void AWeapon::Fire(const FVector& HitTarget)
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 	}
 
+	if (!HasAuthority()) return;
+
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 	const USkeletalMeshSocket* MuzzleFlashSocket = WeaponMesh->GetSocketByName(FName("Muzzle_Flash_Position"));
 	if(MuzzleFlashSocket)
 	{
 
-		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(WeaponMesh);
+		FTransform SocketTransform;
+		FRotator TargetRotation;
 
-		FVector TargetDirection = HitTarget - SocketTransform.GetLocation();
-		FRotator TargetRotation = TargetDirection.Rotation();
+		if(AStingerCharacter* Character = Cast<AStingerCharacter>(GetOwner()))
+		{
+
+			SocketTransform = MuzzleFlashSocket->GetSocketTransform(WeaponMesh);
+
+			if(Character->IsAiming())
+			{
+				const FVector TargetDirection = HitTarget - SocketTransform.GetLocation();
+				TargetRotation = TargetDirection.Rotation();
+			}
+			else
+			{
+				TargetRotation = SocketTransform.GetRotation().Rotator();
+			}
+		}
 
 		if(ProjectileClass && InstigatorPawn)
 		{

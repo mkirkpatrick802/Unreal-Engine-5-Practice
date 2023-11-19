@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "TurningInPlace.h"
 #include "StingerCharacter.generated.h"
 
 
@@ -107,6 +108,8 @@ public:
 
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+
 	AWeapon* GetEquippedWeapon();
 
 	bool IsAiming();
@@ -121,4 +124,7 @@ protected:
 private:
 
 	float AO_Pitch;
+	float AO_Yaw;
+	ETurningInPlace TurningInPlace;
+
 };

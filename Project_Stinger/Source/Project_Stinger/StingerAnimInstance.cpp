@@ -27,6 +27,7 @@ void UStingerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	IsCrouched = StingerCharacter->bIsCrouched;
 	IsAiming = StingerCharacter->IsAiming();
 	AO_Pitch = StingerCharacter->GetAO_Pitch();
+	TurningInPlace = StingerCharacter->GetTurningInPlace();
 
 	EquippedWeapon = StingerCharacter->GetEquippedWeapon();
 	if(EquippedWeapon && EquippedWeapon->GetWeaponMesh() && StingerCharacter->GetMesh())

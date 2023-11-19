@@ -6,6 +6,8 @@
 
 #define TRACE_LENGTH 80000
 
+class AWeapon;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_STINGER_API UCombatComponent : public UActorComponent
 {
@@ -30,10 +32,10 @@ protected:
 	void Fire();
 
 	UFUNCTION(Server, Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire();
+	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
@@ -44,9 +46,4 @@ private:
 
 	UPROPERTY(Replicated)
 	bool IsAiming;
-
-	FVector HitTarget;
-
-public:	
-
 };

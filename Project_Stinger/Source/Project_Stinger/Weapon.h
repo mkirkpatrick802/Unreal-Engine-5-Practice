@@ -4,8 +4,6 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
-
-
 UCLASS()
 class PROJECT_STINGER_API AWeapon : public AActor
 {

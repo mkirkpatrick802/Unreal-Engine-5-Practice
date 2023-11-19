@@ -220,6 +220,7 @@ void AStingerCharacter::AimOffset(float DeltaTime)
 	if(!IsAiming())
 	{
 		AO_Pitch = 0;
+		AO_Yaw = 0;
 		return;
 	}
 

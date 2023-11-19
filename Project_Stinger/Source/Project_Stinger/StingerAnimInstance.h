@@ -4,6 +4,7 @@
 #include "Animation/AnimInstance.h"
 #include "StingerAnimInstance.generated.h"
 
+enum class ETurningInPlace : uint8;
 class AStingerCharacter;
 
 UCLASS()
@@ -41,4 +42,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	FTransform LeftHandTransform;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	ETurningInPlace TurningInPlace;
 };
