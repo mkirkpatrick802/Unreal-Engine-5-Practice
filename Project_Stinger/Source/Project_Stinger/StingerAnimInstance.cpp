@@ -3,6 +3,7 @@
 #include "StingerCharacter.h"
 #include "Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UStingerAnimInstance::NativeInitializeAnimation()
 {
@@ -32,7 +33,7 @@ void UStingerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	EquippedWeapon = StingerCharacter->GetEquippedWeapon();
 	if(EquippedWeapon && EquippedWeapon->GetWeaponMesh() && StingerCharacter->GetMesh())
 	{
-		USkeletalMeshComponent* WeaponMesh = EquippedWeapon->GetWeaponMesh();
+		const USkeletalMeshComponent* WeaponMesh = EquippedWeapon->GetWeaponMesh();
 		LeftHandTransform = WeaponMesh->GetSocketTransform(FName("LeftHandSocket"), RTS_World);
 
 		FVector OutPosition;

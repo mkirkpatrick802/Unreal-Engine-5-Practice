@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Weapon.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -73,6 +74,28 @@ void AStingerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	AimOffset(DeltaSeconds);
+	HideCameraIfCharacterClose();
+}
+
+void AStingerCharacter::HideCameraIfCharacterClose()
+{
+	if (!IsLocallyControlled()) return;
+	if ((FollowCamera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold)
+	{
+		GetMesh()->SetVisibility(false);
+		if (Combat && Combat->CurrentWeapon && Combat->CurrentWeapon->GetWeaponMesh())
+		{
+			Combat->CurrentWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true);
+		if (Combat && Combat->CurrentWeapon && Combat->CurrentWeapon->GetWeaponMesh())
+		{
+			Combat->CurrentWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+	}
 }
 
 void AStingerCharacter::BeginPlay()
@@ -245,6 +268,13 @@ void AStingerCharacter::ToggleFireWeapon()
 
 	if(Combat)
 		Combat->Fire();
+}
+
+void AStingerCharacter::Hit()
+{
+	IBulletHitInterface::Hit();
+
+
 }
 
 void AStingerCharacter::PlayFireMontage()

@@ -1,5 +1,6 @@
 #include "Projectile.h"
 
+#include "BulletHitInterface.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,7 +40,12 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// TODO: Apply Damage
+	if(OtherActor && OtherActor->Implements<UBulletHitInterface>())
+	{
+		IBulletHitInterface* HitInterface = Cast<IBulletHitInterface>(OtherActor);
+		HitInterface->Hit();
+	}
+
 	ServerOnHit();
 	Destroy();
 }

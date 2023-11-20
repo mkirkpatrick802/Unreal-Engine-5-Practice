@@ -48,6 +48,13 @@ void AHornet::Tick(float DeltaTime)
 	DrawDebug();
 }
 
+void AHornet::Hit()
+{
+	IBulletHitInterface::Hit();
+
+	Destroy();
+}
+
 void AHornet::UpdateNeighbourhood()
 {
 	if(!HornetOctree) return;

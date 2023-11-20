@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BulletHitInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "InteractWithCrosshairsInterface.h"
 #include "TurningInPlace.h"
 #include "StingerCharacter.generated.h"
 
@@ -12,9 +14,13 @@
 class AWeapon;
 
 UCLASS(config=Game)
-class AStingerCharacter : public ACharacter
+class AStingerCharacter : public ACharacter, public IInteractWithCrosshairsInterface, public IBulletHitInterface
 {
 	GENERATED_BODY()
+
+	/*
+	 *  Components
+	 */
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -85,10 +91,14 @@ protected:
 
 	void ToggleFireWeapon();
 
+	virtual void Hit() override;
+
 private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerUpdateControlRotation(bool SetControlRotationYaw);
+
+	void HideCameraIfCharacterClose();
 
 protected:
 
@@ -119,6 +129,9 @@ public:
 
 	bool IsAiming() const;
 
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold = 100.f;
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
@@ -131,5 +144,4 @@ private:
 
 	UPROPERTY()
 	AWeapon* EquipWeapon;
-
 };

@@ -1,9 +1,9 @@
 #include "CombatComponent.h"
 
 #include "StingerCharacter.h"
-#include "StingerHUD.h"
 #include "StingerPlayerController.h"
 #include "Weapon.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -29,6 +29,9 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	SetHUDCrosshairs(DeltaTime);
+
+	FHitResult HitResult;
+	TraceUnderCrosshairs(HitResult);
 }
 
 
@@ -42,7 +45,6 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 		HUD = HUD == nullptr ? Cast<AStingerHUD>(Controller->GetHUD()) : HUD;
 		if (HUD && CurrentWeapon)
 		{
-			FHUDPackage Package;
 			if(IsAiming)
 			{
 				Package.CrosshairsCenter = CurrentWeapon->CrosshairsCenter;
@@ -59,6 +61,27 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				Package.CrosshairsBottom = nullptr;
 				Package.CrosshairsTop = nullptr;
 			}
+
+			// calculate crosshair spread
+			// [0, 600] -> [0, 1]
+			FVector2D WalkSpeedRange(0, Character->GetCharacterMovement()->MaxWalkSpeed);
+			FVector2D VelocityMultiplierRange(0, 1);
+			FVector Velocity = Character->GetVelocity();
+			Velocity.Z = 0;
+
+			CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
+
+			if(Character->GetCharacterMovement()->IsFalling())
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.25f, DeltaTime, 2.25f);
+			}
+			else
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, 30.f);
+			}
+
+			Package.CrosshairSpread = CrosshairVelocityFactor + CrosshairInAirFactor;
+
 			HUD->SetHUDPackage(Package);
 		}
 	}
@@ -121,9 +144,29 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 	if(ScreenToWorld)
 	{
 		FVector Start = CrosshairWorldPosition;
+
+		if(Character)
+		{
+			float DistanceToCharacter = (Character->GetActorLocation() - Start).Size();
+			Start += CrosshairWorldDirection * (DistanceToCharacter + 100);
+		}
+
 		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 
 		GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECC_Visibility);
 
+		if (TraceHitResult.ImpactPoint.IsZero())
+		{
+			TraceHitResult.ImpactPoint = End;
+		}
+
+		if(TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
+		{
+			Package.CrosshairsColor = FLinearColor::Red;
+		}
+		else
+		{
+			Package.CrosshairsColor = FLinearColor::White;
+		}
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BulletHitInterface.h"
+#include "InteractWithCrosshairsInterface.h"
 #include "GameFramework/Pawn.h"
 #include "Hornet.generated.h"
 
@@ -17,7 +19,7 @@ enum HornetState
 };
 
 UCLASS()
-class PROJECT_STINGER_API AHornet : public APawn
+class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairsInterface, public IBulletHitInterface
 {
 	GENERATED_BODY()
 
@@ -25,6 +27,7 @@ public:
 
 	AHornet();
 	virtual void Tick(float DeltaTime) override;
+	virtual void Hit() override;
 
 	// Setters
 	void SetTree(Octree* Tree);

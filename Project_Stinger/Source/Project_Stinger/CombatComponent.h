@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StingerHUD.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
@@ -59,4 +60,11 @@ private:
 
 	UPROPERTY()
 	AWeapon* CurrentWeapon;
+
+	//HUD & Crosshairs
+
+	FHUDPackage Package;
+
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
 };

@@ -16,6 +16,7 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
 protected:
+
 	UPROPERTY(BlueprintReadOnly, Category= Character)
 	AStingerCharacter* StingerCharacter;
 
