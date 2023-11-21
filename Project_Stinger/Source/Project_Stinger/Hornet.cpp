@@ -1,8 +1,11 @@
 #include "Hornet.h"
 
 #include "Octree.h"
+#include "StingerGameMode.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AHornet::AHornet()
 {
@@ -28,31 +31,87 @@ void AHornet::BeginPlay()
 	Super::BeginPlay();
 
 	Transform = GetActorTransform();
-	Velocity = FVector(1,0,1);
-}
 
-void AHornet::SetTree(Octree* Tree)
-{
-	HornetOctree = Tree;
+	if (AStingerGameMode* GameMode = Cast<AStingerGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+		GameMode->HornetSpawned(this);
 }
 
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Movement
+	CurrentMoveVector = NewMoveVector;
+
 	UpdateNeighbourhood();
-	UpdateTransform();
+
+	CalculateNewMoveVector();
+
+	UpdateTransform(DeltaTime);
 
 	// Debug
 	DrawDebug();
 }
 
-void AHornet::Hit()
-{
-	IBulletHitInterface::Hit();
 
-	Destroy();
+void AHornet::CalculateNewMoveVector()
+{
+	ResetForces();
+	CalculateAlignment();
+
+	if (Neighborhood.Num() > 0)
+	{
+		CalculateCohesion();
+		CalculateSeparation();
+	}
+
+	//TODO: Do Collision Tests
+
+
+	NewMoveVector = AlignmentForce + CohesionForce + SeparationForce;
+}
+
+void AHornet::ResetForces()
+{
+	CohesionForce = FVector::Zero();
+	AlignmentForce = FVector::Zero();
+	SeparationForce = FVector::Zero();
+}
+
+void AHornet::CalculateAlignment()
+{
+	for (const AHornet* Neighbor : Neighborhood)
+	{
+		if (Neighbor)
+		{
+			AlignmentForce += Neighbor->CurrentMoveVector.GetSafeNormal();
+		}
+	}
+
+	AlignmentForce = (CurrentMoveVector + AlignmentForce).GetSafeNormal() * AlignmentWeight;
+}
+
+void AHornet::CalculateCohesion()
+{
+	const FVector& Location = GetActorLocation();
+	for (const AHornet* Neighbor : Neighborhood)
+	{
+		CohesionForce += Neighbor->GetActorLocation() - Location;
+	}
+
+	CohesionForce = (CohesionForce / Neighborhood.Num() / CohesionLerp) * CohesionWeight;
+}
+
+void AHornet::CalculateSeparation()
+{
+	const FVector& Location = GetActorLocation();
+	for (const AHornet* Neighbor : Neighborhood)
+	{
+		FVector Separation = Location - Neighbor->GetActorLocation();
+		SeparationForce += Separation.GetSafeNormal() / FMath::Abs(Separation.Size() - ColliderRadius);
+	}
+
+	const FVector SeparationForceComponent = SeparationForce * SeparationForce;
+	SeparationForce += (SeparationForceComponent + SeparationForceComponent * (SeparationLerp / Neighborhood.Num())) * SeparationWeight;
 }
 
 void AHornet::UpdateNeighbourhood()
@@ -63,12 +122,36 @@ void AHornet::UpdateNeighbourhood()
 	HornetOctree->GetNeighbors(Neighborhood, this);
 }
 
-void AHornet::UpdateTransform()
+void AHornet::UpdateTransform(float DeltaTime)
 {
-	Transform.SetLocation(Transform.GetLocation() + Velocity);
-	Transform.SetRotation(Velocity.ToOrientationQuat());
-	//SetActorTransform(Transform);
+	const FVector NewDirection = (NewMoveVector * MoveSpeed * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
+	Transform.SetLocation(Transform.GetLocation() + NewDirection);
+	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
+	SetActorTransform(Transform);
 }
+
+/**
+ *	Combat Behavior 
+ */
+
+void AHornet::Hit()
+{
+	IBulletHitInterface::Hit();
+
+	Destroy();
+}
+
+void AHornet::Destroyed()
+{
+	Super::Destroyed();
+
+	if (AStingerGameMode* GameMode = Cast<AStingerGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+		GameMode->HornetDestroyed(this);
+}
+
+/**
+ *	Debugging
+ */
 
 void AHornet::DrawDebug() const
 {
@@ -76,14 +159,11 @@ void AHornet::DrawDebug() const
 	const FVector& Location = GetActorLocation();
 
 	// Movement Vector
-	DrawDebugLine(World, Location,Location + Velocity * 100.0f, FColor::Green, false, -1, 0, 1.0f);
-
-	// Vision Radius
-	//DrawDebugSphere(World, GetActorLocation(), VisionRadius, 15, FColor::Blue, false, -1, 0, .5f);
+	DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MaxSpeed, FColor::Green, false, -1, 1, 1.5f);
 
 	//Draw Connections to Neighbors
 	for (const auto Hornet : Neighborhood)
 	{
-		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 3);
+		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 2);
 	}
 }

@@ -18,19 +18,33 @@ enum HornetState
 	Fleeing,		// In this state the hornet will be moving away from players and trying to regroup with it others
 };
 
+/**
+ *	Hornet Boid
+ */
 UCLASS()
 class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairsInterface, public IBulletHitInterface
 {
+	// Object Init & Components
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* SphereCollider;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(EditAnywhere)
+	UArrowComponent* Arrow;
 
 public:
 
 	AHornet();
 	virtual void Tick(float DeltaTime) override;
 	virtual void Hit() override;
+	virtual void Destroyed() override;
 
 	// Setters
-	void SetTree(Octree* Tree);
+	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
 
 	// Getters
 	float GetColliderRadius() const { return ColliderRadius; }
@@ -42,30 +56,72 @@ protected:
 
 private:
 
+	void CalculateNewMoveVector();
+	void ResetForces();
+	void CalculateAlignment();
+	void CalculateCohesion();
+	void CalculateSeparation();
+
 	void UpdateNeighbourhood();
-	void UpdateTransform();
+	void UpdateTransform(float DeltaTime);
+
+
 	void DrawDebug() const;
 
 public:
 
-
+	UPROPERTY()
+	FVector CurrentMoveVector;
 
 protected:
+
+	/**
+	 *	General Settings
+	 */
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
 	float VisionRadius = 200;
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
-	float ColliderRadius = 75;
+	float ColliderRadius = 100;
 
-	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereCollider;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MoveSpeed = 40;
 
-	UPROPERTY(EditAnywhere)
-	USkeletalMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MaxSpeed = 100;
 
-	UPROPERTY(EditAnywhere)
-	UArrowComponent* Arrow;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MaxRotationSpeed = 3;
+
+	/**
+	 *	Alignment Settings
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float AlignmentWeight = .1f;
+
+	/**
+	 *	Cohesion Settings
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float CohesionWeight = .5f;
+
+	// Damping
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float CohesionLerp = 5;
+
+	/**
+	 *	Separation Settings
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float SeparationWeight = 1000;
+
+	// Damping
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float SeparationLerp = 5;
 
 private:
 
@@ -79,8 +135,16 @@ private:
 	TArray<AHornet*> Neighborhood;
 
 	UPROPERTY()
-	FVector Velocity;
+	FVector CohesionForce;
 
-	// Used for finding neighbors
+	UPROPERTY()
+	FVector AlignmentForce;
+
+	UPROPERTY()
+	FVector SeparationForce;
+
+	UPROPERTY()
+	FVector NewMoveVector;
+
 	Octree* HornetOctree;
 };

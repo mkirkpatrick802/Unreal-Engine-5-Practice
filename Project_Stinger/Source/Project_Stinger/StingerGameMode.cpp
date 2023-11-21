@@ -29,18 +29,21 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	Hornets.Empty();
-
-	for (AHornet* Hornet : TActorRange<AHornet>(GetWorld()))
-	{
-		Hornet->SetTree(HornetOctree);
-		Hornets.AddUnique(Hornet);
-	}
-
 	HornetOctree->Clear();
 	for (AHornet* Hornet : Hornets)
 		HornetOctree->Insert(Hornet);
 
 	HornetOctree->Resize();
 	HornetOctree->DrawDebug(GetWorld());
+}
+
+void AStingerGameMode::HornetSpawned(AHornet* Hornet)
+{
+	Hornet->SetTree(HornetOctree);
+	Hornets.AddUnique(Hornet);
+}
+
+void AStingerGameMode::HornetDestroyed(AHornet* Hornet)
+{
+	Hornets.Remove(Hornet);
 }

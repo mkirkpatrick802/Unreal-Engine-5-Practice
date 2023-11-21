@@ -19,6 +19,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	// Hornet Management
+	void HornetSpawned(AHornet* Hornet);
+	void HornetDestroyed(AHornet* Hornet);
+
 private:
 
 	Octree* HornetOctree;
