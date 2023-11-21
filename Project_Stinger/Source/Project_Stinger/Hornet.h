@@ -86,10 +86,10 @@ protected:
 	float ColliderRadius = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MoveSpeed = 40;
+	float MoveSpeed = 15;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MaxSpeed = 100;
+	float MaxSpeed = 25;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 3;
@@ -99,25 +99,25 @@ protected:
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentWeight = .1f;
+	float AlignmentWeight = 1;
 
 	/**
 	 *	Cohesion Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionWeight = .5f;
+	float CohesionWeight = 1;
 
 	// Damping
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionLerp = 5;
+	float CohesionLerp = 100;
 
 	/**
 	 *	Separation Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float SeparationWeight = 1000;
+	float SeparationWeight = .8;
 
 	// Damping
 	UPROPERTY(EditAnywhere, Category = "Flocking")

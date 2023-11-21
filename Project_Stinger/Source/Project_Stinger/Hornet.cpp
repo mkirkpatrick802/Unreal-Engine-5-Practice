@@ -75,6 +75,7 @@ void AHornet::ResetForces()
 	CohesionForce = FVector::Zero();
 	AlignmentForce = FVector::Zero();
 	SeparationForce = FVector::Zero();
+	NewMoveVector = FVector::Zero();
 }
 
 void AHornet::CalculateAlignment()
@@ -101,6 +102,7 @@ void AHornet::CalculateCohesion()
 	CohesionForce = (CohesionForce / Neighborhood.Num() / CohesionLerp) * CohesionWeight;
 }
 
+// TODO: Separation Not Working Good Enough
 void AHornet::CalculateSeparation()
 {
 	const FVector& Location = GetActorLocation();
@@ -159,11 +161,17 @@ void AHornet::DrawDebug() const
 	const FVector& Location = GetActorLocation();
 
 	// Movement Vector
-	DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MaxSpeed, FColor::Green, false, -1, 1, 1.5f);
+	DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MoveSpeed, FColor::Green, false, -1, 1, 1.5f);
+
+	// Cohesion Vector
+	DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
+
+	// Separation Vector
+	DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
 
 	//Draw Connections to Neighbors
-	for (const auto Hornet : Neighborhood)
+	/*for (const auto Hornet : Neighborhood)
 	{
-		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 2);
-	}
+		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
+	}*/
 }
