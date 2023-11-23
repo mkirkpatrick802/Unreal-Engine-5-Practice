@@ -13,7 +13,7 @@ AHornet::AHornet()
 
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
 	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	SphereCollider->SetSphereRadius(ColliderRadius);
+	SphereCollider->SetSphereRadius(100);
 	SphereCollider->SetMobility(EComponentMobility::Movable);
 	SetRootComponent(SphereCollider);
 
@@ -56,18 +56,24 @@ void AHornet::Tick(float DeltaTime)
 void AHornet::CalculateNewMoveVector()
 {
 	ResetForces();
-	CalculateAlignment();
 
 	if (Neighborhood.Num() > 0)
 	{
+		CurrentState = Flocking;
 		CalculateCohesion();
 		CalculateSeparation();
+		CalculateAlignment();
+	}
+	else
+	{
+		CurrentState = Wandering;
+		CalculateRandomMoveVector();
 	}
 
-	//TODO: Do Collision Tests
+	CalculateCollisions();
 
 
-	NewMoveVector = AlignmentForce + CohesionForce + SeparationForce;
+	NewMoveVector += AlignmentForce + CohesionForce + SeparationForce + CollisionForce;
 }
 
 void AHornet::ResetForces()
@@ -102,18 +108,39 @@ void AHornet::CalculateCohesion()
 	CohesionForce = (CohesionForce / Neighborhood.Num() / CohesionLerp) * CohesionWeight;
 }
 
-// TODO: Separation Not Working Good Enough
 void AHornet::CalculateSeparation()
 {
 	const FVector& Location = GetActorLocation();
 	for (const AHornet* Neighbor : Neighborhood)
 	{
-		FVector Separation = Location - Neighbor->GetActorLocation();
-		SeparationForce += Separation.GetSafeNormal() / FMath::Abs(Separation.Size() - ColliderRadius);
+		// The agent will move away from neighbors inversely proportionally to the distance between them.
+		FVector Direction = Location - Neighbor->GetActorLocation();
+		float Distance = Direction.Size();
+
+		SeparationForce += Direction.GetUnsafeNormal() / Distance;
 	}
 
-	const FVector SeparationForceComponent = SeparationForce * SeparationForce;
-	SeparationForce += (SeparationForceComponent + SeparationForceComponent * (SeparationLerp / Neighborhood.Num())) * SeparationWeight;
+	// TODO: Clamp Separation Force
+	SeparationForce *= SeparationWeight * SeparationWeightScale;
+}
+
+void AHornet::CalculateCollisions()
+{
+
+}
+
+void AHornet::CalculateRandomMoveVector()
+{
+	float RandomX = FMath::FRandRange(-1.0f, 1.0f);
+	float RandomY = FMath::FRandRange(-1.0f, 1.0f);
+	float RandomZ = FMath::FRandRange(-1.0f, 1.0f);
+
+	// Normalize the vector to get a unit vector
+	FVector RandomVector = FVector(RandomX, RandomY, RandomZ).GetSafeNormal();
+
+	// Scale the vector based on the desired speed range
+	float RandomSpeed = FMath::FRandRange(MoveSpeed, MaxSpeed);
+	NewMoveVector = RandomVector * RandomSpeed;
 }
 
 void AHornet::UpdateNeighbourhood()
@@ -126,7 +153,7 @@ void AHornet::UpdateNeighbourhood()
 
 void AHornet::UpdateTransform(float DeltaTime)
 {
-	const FVector NewDirection = (NewMoveVector * MoveSpeed * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
+	const FVector NewDirection = (NewMoveVector * MoveSpeed * 2 * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
 	Transform.SetLocation(Transform.GetLocation() + NewDirection);
 	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
 	SetActorTransform(Transform);
