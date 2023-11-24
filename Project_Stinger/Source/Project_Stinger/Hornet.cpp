@@ -57,21 +57,19 @@ void AHornet::CalculateNewMoveVector()
 {
 	ResetForces();
 
+	CalculateAlignment();
+
 	if (Neighborhood.Num() > 0)
 	{
-		CurrentState = Flocking;
 		CalculateCohesion();
 		CalculateSeparation();
-		CalculateAlignment();
 	}
 	else
 	{
-		CurrentState = Wandering;
-		CalculateRandomMoveVector();
+		//CalculateRandomMoveVector();
 	}
 
 	CalculateCollisions();
-
 
 	NewMoveVector += AlignmentForce + CohesionForce + SeparationForce + CollisionForce;
 }
@@ -88,7 +86,7 @@ void AHornet::CalculateAlignment()
 {
 	for (const AHornet* Neighbor : Neighborhood)
 	{
-		if (Neighbor)
+		if (Neighbor && GetDistanceTo(Neighbor) < AlignmentRadius)
 		{
 			AlignmentForce += Neighbor->CurrentMoveVector.GetSafeNormal();
 		}
@@ -102,10 +100,13 @@ void AHornet::CalculateCohesion()
 	const FVector& Location = GetActorLocation();
 	for (const AHornet* Neighbor : Neighborhood)
 	{
-		CohesionForce += Neighbor->GetActorLocation() - Location;
+		if(Neighbor && GetDistanceTo(Neighbor) < CohesionRadius)
+		{
+			CohesionForce += Neighbor->GetActorLocation() - Location;
+		}
 	}
 
-	CohesionForce = (CohesionForce / Neighborhood.Num() / CohesionLerp) * CohesionWeight;
+	CohesionForce = (CohesionForce / Neighborhood.Num()).GetSafeNormal() * CohesionWeight;
 }
 
 void AHornet::CalculateSeparation()
@@ -113,20 +114,23 @@ void AHornet::CalculateSeparation()
 	const FVector& Location = GetActorLocation();
 	for (const AHornet* Neighbor : Neighborhood)
 	{
-		// The agent will move away from neighbors inversely proportionally to the distance between them.
-		FVector Direction = Location - Neighbor->GetActorLocation();
-		float Distance = Direction.Size();
+		if(Neighbor && GetDistanceTo(Neighbor) < SeparationRadius)
+		{
+			// The agent will move away from neighbors inversely proportionally to the distance between them.
+			FVector Direction = Location - Neighbor->GetActorLocation();
+			float Distance = Direction.Size();
 
-		SeparationForce += Direction.GetUnsafeNormal() / Distance;
+			SeparationForce += Direction.GetUnsafeNormal() / Distance;
+		}
 	}
 
 	// TODO: Clamp Separation Force
-	SeparationForce *= SeparationWeight * SeparationWeightScale;
+	SeparationForce = SeparationForce.GetSafeNormal() * SeparationWeight * SeparationWeightScale;
 }
 
 void AHornet::CalculateCollisions()
 {
-
+	CollisionForce = FVector::Zero();
 }
 
 void AHornet::CalculateRandomMoveVector()
@@ -153,7 +157,7 @@ void AHornet::UpdateNeighbourhood()
 
 void AHornet::UpdateTransform(float DeltaTime)
 {
-	const FVector NewDirection = (NewMoveVector * MoveSpeed * 2 * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
+	const FVector NewDirection = (NewMoveVector * MoveSpeed * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
 	Transform.SetLocation(Transform.GetLocation() + NewDirection);
 	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
 	SetActorTransform(Transform);
@@ -187,14 +191,29 @@ void AHornet::DrawDebug() const
 	const UWorld* World = GetWorld();
 	const FVector& Location = GetActorLocation();
 
+	// Sight Radius
+	// DrawDebugSphere(World, Location, VisionRadius, 10, FColor::Red, false, -1, 1, 1);
+
 	// Movement Vector
-	DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MoveSpeed, FColor::Green, false, -1, 1, 1.5f);
+	// DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MoveSpeed, FColor::Green, false, -1, 1, 1.5f);
+
+	// Alignment Radius
+	// DrawDebugSphere(World, Location, AlignmentRadius, 10, FColor::Green, false, -1, 0, 1);
+
+	// Alignment Radius
+	// TODO: Finish
+
+	// Cohesion Radius
+	// DrawDebugSphere(World, Location, CohesionRadius, 10, FColor::Orange, false, -1, 0, 1);
 
 	// Cohesion Vector
-	DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
+	// DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
+
+	// Separation Radius
+	// DrawDebugSphere(World, Location, SeparationRadius, 10, FColor::Blue, false, -1, 0, 1);
 
 	// Separation Vector
-	DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
+	// DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
 
 	//Draw Connections to Neighbors
 	/*for (const auto Hornet : Neighborhood)

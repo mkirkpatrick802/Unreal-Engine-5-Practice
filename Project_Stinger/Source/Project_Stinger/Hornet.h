@@ -2,23 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "BulletHitInterface.h"
+#include "HornetController.h"
 #include "InteractWithCrosshairsInterface.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Hornet.generated.h"
 
+class UAISenseConfig_Sight;
+class UAIPerceptionComponent;
 class Octree;
 class USphereComponent;
 class UArrowComponent;
-
-UENUM(BlueprintType)
-enum HornetState
-{
-	Wandering = 0,
-	Flocking,	// In this state the hornet will be preforming standard flocking behavior w/ Separation, Alignment, Cohesion
-	Chase,			// In this state the hornet will be chasing a target while maintaining its formation w/ Separation, Cohesion
-	Fleeing,		// In this state the hornet will be moving away from players and trying to regroup with it others
-};
 
 /**
  *	Hornet Boid
@@ -69,7 +63,6 @@ private:
 	void UpdateNeighbourhood();
 	void UpdateTransform(float DeltaTime);
 
-
 	void DrawDebug() const;
 
 public:
@@ -84,7 +77,7 @@ protected:
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
-	float VisionRadius = 50;
+	float VisionRadius = 300;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MoveSpeed = 600;
@@ -100,31 +93,35 @@ protected:
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentWeight = .1f;
+	float AlignmentRadius = 300;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float AlignmentWeight = .5f;
 
 	/**
 	 *	Cohesion Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionWeight = .7f;
+	float CohesionRadius = 150;
 
-	// Damping
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionLerp = 100;
+	float CohesionWeight = 1;
 
 	/**
 	 *	Separation Settings
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Flocking", meta = (ClampMin = "0.0", ClampMax = "10.0"))
-	float SeparationWeight = 2;
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float SeparationRadius = 100;
 
-	float SeparationWeightScale = 10;
+	UPROPERTY(EditAnywhere, Category = "Flocking", meta = (ClampMin = "0.0", ClampMax = "10.0"))
+	float SeparationWeight = 3;
+
+	float SeparationWeightScale = 20;
 
 private:
 
-	TEnumAsByte<HornetState> CurrentState;
 	FTransform Transform;
 
 	Octree* HornetOctree;
