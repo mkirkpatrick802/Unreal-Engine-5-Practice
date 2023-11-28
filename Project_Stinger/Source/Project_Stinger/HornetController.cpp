@@ -26,7 +26,7 @@ AHornetController::AHornetController()
 
 void AHornetController::OnPawnDetected(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (GEngine)
+	/*if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(
 			-1,
@@ -34,5 +34,5 @@ void AHornetController::OnPawnDetected(AActor* Actor, FAIStimulus Stimulus)
 			FColor::Green,
 			FString::Printf(TEXT("Player Seen!!"))
 		);
-	}
+	}*/
 }

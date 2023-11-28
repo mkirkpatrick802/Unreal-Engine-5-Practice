@@ -96,7 +96,7 @@ protected:
 	float AlignmentRadius = 300;
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentWeight = .5f;
+	float AlignmentWeight = .2f;
 
 	/**
 	 *	Cohesion Settings
@@ -106,19 +106,19 @@ protected:
 	float CohesionRadius = 150;
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionWeight = 1;
+	float CohesionWeight = 10;
 
 	/**
 	 *	Separation Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float SeparationRadius = 100;
+	float SeparationRadius = 150;
 
 	UPROPERTY(EditAnywhere, Category = "Flocking", meta = (ClampMin = "0.0", ClampMax = "10.0"))
-	float SeparationWeight = 3;
+	float SeparationWeight = 1;
 
-	float SeparationWeightScale = 20;
+	float SeparationWeightScale = 10;
 
 private:
 
