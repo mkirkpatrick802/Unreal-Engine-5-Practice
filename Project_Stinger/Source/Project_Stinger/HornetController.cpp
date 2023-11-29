@@ -1,10 +1,14 @@
 #include "HornetController.h"
 
+#include "Hornet.h"
+#include "Octree.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
 AHornetController::AHornetController()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AI Perception"));
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AHornetController::OnPawnDetected);
 
@@ -24,15 +28,38 @@ AHornetController::AHornetController()
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
 }
 
+void AHornetController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Hornet = Cast<AHornet>(GetPawn());
+}
+
+void AHornetController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	UpdateNeighbourhood();
+}
+
+void AHornetController::ChangeAction(HornetActions NewAction)
+{
+	if(NewAction == CurrentAction) return;
+	CurrentAction = NewAction;
+}
+
 void AHornetController::OnPawnDetected(AActor* Actor, FAIStimulus Stimulus)
 {
-	/*if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.f,
-			FColor::Green,
-			FString::Printf(TEXT("Player Seen!!"))
-		);
-	}*/
+
+}
+
+void AHornetController::UpdateNeighbourhood()
+{
+	if (!HornetOctree || !Hornet) return;
+
+	Neighborhood.Empty();
+	HornetOctree->GetNeighbors(Neighborhood, Hornet);
+	Hornet->SetNeighborhood(Neighborhood);
+
+	ChangeAction(Neighborhood.Num() > 0 ? Swarming : Wandering);
 }

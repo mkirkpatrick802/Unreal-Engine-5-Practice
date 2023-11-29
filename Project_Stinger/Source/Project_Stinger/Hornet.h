@@ -23,6 +23,8 @@ class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairs
 	// Object Init & Components
 	GENERATED_BODY()
 
+	DECLARE_DELEGATE(FHornetActionDelegate);
+
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereCollider;
 
@@ -40,7 +42,8 @@ public:
 	virtual void Destroyed() override;
 
 	// Setters
-	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
+	FORCEINLINE void SetTree(Octree* Tree) const { Cast<AHornetController>(GetController())->SetTree(Tree); }
+	FORCEINLINE void SetNeighborhood(const TArray<AHornet*>& NewNeighborhood) { Neighborhood = NewNeighborhood; }
 
 	// Getters
 	float GetColliderRadius() const { return SphereCollider->GetUnscaledSphereRadius(); }
@@ -58,9 +61,7 @@ private:
 	void CalculateCohesion();
 	void CalculateSeparation();
 	void CalculateCollisions();
-	void CalculateRandomMoveVector();
 
-	void UpdateNeighbourhood();
 	void UpdateTransform(float DeltaTime);
 
 	void DrawDebug() const;
@@ -123,10 +124,11 @@ private:
 
 	FTransform Transform;
 
-	Octree* HornetOctree;
-
-	UPROPERTY()
 	TArray<AHornet*> Neighborhood;
+
+	TEnumAsByte<HornetStates> CurrentState;
+	TEnumAsByte<HornetActions> CurrentAction;
+	TMap<HornetActions, FHornetActionDelegate> ActionFunctionMap;
 
 	FVector CohesionForce;
 	FVector AlignmentForce;

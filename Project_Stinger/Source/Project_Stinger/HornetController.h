@@ -5,15 +5,25 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "HornetController.generated.h"
 
+class AHornet;
+class Octree;
 class UAISenseConfig_Sight;
 
 UENUM(BlueprintType)
-enum HornetState
+enum HornetStates
 {
-	Wandering = 0,
-	Flocking,	// In this state the hornet will be preforming standard flocking behavior w/ Separation, Alignment, Cohesion
-	Chase,			// In this state the hornet will be chasing a target while maintaining its formation w/ Separation, Cohesion
-	Fleeing,		// In this state the hornet will be moving away from players and trying to regroup with it others
+	Worker,
+	Soldier,
+};
+
+UENUM(BlueprintType)
+enum HornetActions
+{
+	Wandering,	// Both
+	Swarming,	// Both
+	Chase,		// Worker
+	Charge,		// Soldier
+	Fleeing,	// Worker
 };
 
 UCLASS()
@@ -30,13 +40,30 @@ class PROJECT_STINGER_API AHornetController : public AAIController
 public:
 
 	AHornetController();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+
+	// Setters
+	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
 
 private:
+
+	void ChangeAction(HornetActions NewAction);
 
 	UFUNCTION()
 	void OnPawnDetected(AActor* Actor, FAIStimulus Stimulus);
 
-public:
+	void UpdateNeighbourhood();
 
-	TEnumAsByte<HornetState> CurrentState;
+private:
+
+	UPROPERTY()
+	AHornet* Hornet;
+
+	Octree* HornetOctree;
+	TArray<AHornet*> Neighborhood;
+
+	TEnumAsByte<HornetStates> CurrentState;
+	TEnumAsByte<HornetActions> CurrentAction;
 };

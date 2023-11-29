@@ -39,15 +39,10 @@ void AHornet::BeginPlay()
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HornetOctree == nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString("Octree NULL!"));
-		return;
-	}
 
 	CurrentMoveVector = NewMoveVector;
 
-	UpdateNeighbourhood();
+	//UpdateNeighbourhood();
 
 	CalculateNewMoveVector();
 
@@ -69,10 +64,6 @@ void AHornet::CalculateNewMoveVector()
 		CalculateAlignment();
 		CalculateCohesion();
 		CalculateSeparation();
-	}
-	else
-	{
-		//CalculateRandomMoveVector();
 	}
 
 	CalculateCollisions();
@@ -149,31 +140,9 @@ void AHornet::CalculateCollisions()
 	CollisionForce = FVector::Zero();
 }
 
-void AHornet::CalculateRandomMoveVector()
-{
-	float RandomX = FMath::FRandRange(-1.0f, 1.0f);
-	float RandomY = FMath::FRandRange(-1.0f, 1.0f);
-	float RandomZ = FMath::FRandRange(-1.0f, 1.0f);
-
-	// Normalize the vector to get a unit vector
-	FVector RandomVector = FVector(RandomX, RandomY, RandomZ).GetSafeNormal();
-
-	// Scale the vector based on the desired speed range
-	float RandomSpeed = FMath::FRandRange(MoveSpeed, MaxSpeed);
-	NewMoveVector = RandomVector * RandomSpeed;
-}
-
-void AHornet::UpdateNeighbourhood()
-{
-	if(!HornetOctree) return;
-
-	Neighborhood.Empty();
-	HornetOctree->GetNeighbors(Neighborhood, this);
-}
-
 void AHornet::UpdateTransform(float DeltaTime)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%f, %f, %f"), NewMoveVector.X, NewMoveVector.Y, NewMoveVector.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%f, %f, %f"), NewMoveVector.X, NewMoveVector.Y, NewMoveVector.Z));
 	const FVector NewDirection = (NewMoveVector * MoveSpeed * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
 	Transform.SetLocation(Transform.GetLocation() + NewDirection);
 	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
@@ -224,7 +193,7 @@ void AHornet::DrawDebug() const
 	// DrawDebugSphere(World, Location, CohesionRadius, 10, FColor::Orange, false, -1, 0, 1);
 
 	// Cohesion Vector
-	 DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
+	// DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
 
 	// Separation Radius
 	// DrawDebugSphere(World, Location, SeparationRadius, 10, FColor::Blue, false, -1, 0, 1);
