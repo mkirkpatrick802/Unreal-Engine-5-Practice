@@ -39,6 +39,11 @@ void AHornet::BeginPlay()
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (HornetOctree == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString("Octree NULL!"));
+		return;
+	}
 
 	CurrentMoveVector = NewMoveVector;
 
@@ -57,10 +62,11 @@ void AHornet::CalculateNewMoveVector()
 {
 	ResetForces();
 
-	CalculateAlignment();
-
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%f"), Neighborhood.Num()));
 	if (Neighborhood.Num() > 0)
 	{
+
+		CalculateAlignment();
 		CalculateCohesion();
 		CalculateSeparation();
 	}
@@ -71,7 +77,8 @@ void AHornet::CalculateNewMoveVector()
 
 	CalculateCollisions();
 
-	NewMoveVector += AlignmentForce + CohesionForce + SeparationForce + CollisionForce;
+	
+	NewMoveVector += AlignmentForce.GetSafeNormal() * AlignmentWeight + CohesionForce * CohesionWeight + SeparationForce * SeparationWeight + CollisionForce;
 }
 
 void AHornet::ResetForces()
@@ -84,29 +91,42 @@ void AHornet::ResetForces()
 
 void AHornet::CalculateAlignment()
 {
+	AlignmentForce = CurrentMoveVector;
+	int ValidNeighbors = 1;
 	for (const AHornet* Neighbor : Neighborhood)
 	{
 		if (Neighbor && GetDistanceTo(Neighbor) < AlignmentRadius)
 		{
-			AlignmentForce += Neighbor->CurrentMoveVector.GetSafeNormal();
+			ValidNeighbors++;
+			AlignmentForce += Neighbor->CurrentMoveVector;
 		}
 	}
 
-	AlignmentForce = (CurrentMoveVector + AlignmentForce).GetSafeNormal() * AlignmentWeight;
+	AlignmentForce /= ValidNeighbors;
 }
 
 void AHornet::CalculateCohesion()
 {
 	const FVector& Location = GetActorLocation();
+	FVector CenterMass = Location;
+
+	int ValidNeighbors = 1;
+
 	for (const AHornet* Neighbor : Neighborhood)
 	{
 		if(Neighbor && GetDistanceTo(Neighbor) < CohesionRadius)
 		{
-			CohesionForce += Neighbor->GetActorLocation() - Location;
+			ValidNeighbors++;
+			CenterMass += Neighbor->GetActorLocation();
 		}
 	}
 
-	CohesionForce = (CohesionForce / Neighborhood.Num()).GetSafeNormal() * CohesionWeight;
+	CenterMass /= ValidNeighbors;
+
+	FVector dir = CenterMass - Location;
+
+	CohesionForce = (dir / CohesionRadius);
+	
 }
 
 void AHornet::CalculateSeparation()
@@ -117,15 +137,11 @@ void AHornet::CalculateSeparation()
 		if(Neighbor && GetDistanceTo(Neighbor) < SeparationRadius)
 		{
 			// The agent will move away from neighbors inversely proportionally to the distance between them.
-			FVector Direction = Location - Neighbor->GetActorLocation();
-			float Distance = Direction.Size();
-
-			SeparationForce += Direction.GetUnsafeNormal() / Distance;
+			FVector Vector = Location - Neighbor->GetActorLocation();
+			
+			SeparationForce += Vector / Vector.SquaredLength();
 		}
 	}
-
-	// TODO: Clamp Separation Force
-	SeparationForce = SeparationForce.GetSafeNormal() * SeparationWeight * SeparationWeightScale;
 }
 
 void AHornet::CalculateCollisions()
@@ -157,6 +173,7 @@ void AHornet::UpdateNeighbourhood()
 
 void AHornet::UpdateTransform(float DeltaTime)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%f, %f, %f"), NewMoveVector.X, NewMoveVector.Y, NewMoveVector.Z));
 	const FVector NewDirection = (NewMoveVector * MoveSpeed * DeltaTime).GetClampedToMaxSize(MaxSpeed * DeltaTime);
 	Transform.SetLocation(Transform.GetLocation() + NewDirection);
 	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
@@ -207,7 +224,7 @@ void AHornet::DrawDebug() const
 	// DrawDebugSphere(World, Location, CohesionRadius, 10, FColor::Orange, false, -1, 0, 1);
 
 	// Cohesion Vector
-	// DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
+	 DrawDebugLine(World, Location,Location + CohesionForce.GetSafeNormal() * CohesionWeight * 50, FColor::Orange, false, -1, 0, 1.5f);
 
 	// Separation Radius
 	// DrawDebugSphere(World, Location, SeparationRadius, 10, FColor::Blue, false, -1, 0, 1);

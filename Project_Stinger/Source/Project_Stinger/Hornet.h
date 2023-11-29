@@ -77,13 +77,13 @@ protected:
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Boid")
-	float VisionRadius = 300;
+	float VisionRadius = 7500;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MoveSpeed = 600;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MaxSpeed = 800;
+	float MaxSpeed = 350;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 6;
@@ -93,38 +93,39 @@ protected:
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentRadius = 300;
+	float AlignmentRadius = 1500;
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentWeight = .2f;
+	float AlignmentWeight = 15;
 
 	/**
 	 *	Cohesion Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionRadius = 150;
+	float CohesionRadius = 1500;
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionWeight = 10;
+	float CohesionWeight = 500;
 
 	/**
 	 *	Separation Settings
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
-	float SeparationRadius = 150;
+	float SeparationRadius = 600;
 
-	UPROPERTY(EditAnywhere, Category = "Flocking", meta = (ClampMin = "0.0", ClampMax = "10.0"))
-	float SeparationWeight = 1;
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float SeparationWeight = 3000;
 
-	float SeparationWeightScale = 10;
 
 private:
 
 	FTransform Transform;
 
 	Octree* HornetOctree;
+
+	UPROPERTY()
 	TArray<AHornet*> Neighborhood;
 
 	FVector CohesionForce;
