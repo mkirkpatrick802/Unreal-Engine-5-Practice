@@ -33,6 +33,7 @@ void AHornetController::BeginPlay()
 	Super::BeginPlay();
 
 	Hornet = Cast<AHornet>(GetPawn());
+	CurrentAction = Wandering;
 }
 
 void AHornetController::Tick(float DeltaSeconds)
@@ -46,6 +47,19 @@ void AHornetController::ChangeAction(HornetActions NewAction)
 {
 	if(NewAction == CurrentAction) return;
 	CurrentAction = NewAction;
+
+	if(CurrentState == Soldier)
+	{
+		if (CurrentAction == Swarming)
+			CurrentAction = Flocking;
+
+		if (CurrentAction == Chasing)
+			CurrentAction = Charging;
+
+		//if (CurrentAction == Fleeing)
+		//	CurrentAction = Retreating;
+	}
+
 	ActionChangedEvent.Broadcast(CurrentAction);
 }
 

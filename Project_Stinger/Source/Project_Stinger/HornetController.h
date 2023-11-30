@@ -5,6 +5,7 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "HornetController.generated.h"
 
+class AQueen;
 class AHornet;
 class Octree;
 class UAISenseConfig_Sight;
@@ -12,6 +13,7 @@ class UAISenseConfig_Sight;
 UENUM(BlueprintType)
 enum HornetStates
 {
+	NULLState = 0,
 	Worker,
 	Soldier,
 };
@@ -19,11 +21,14 @@ enum HornetStates
 UENUM(BlueprintType)
 enum HornetActions
 {
-	Wandering,	// Both
-	Swarming,	// Both
+	NULLAction = 0,
+	Wandering,		// Both
+	Swarming,		// Worker
+	Flocking,		// Soldier
 	Chasing,		// Worker
 	Charging,		// Soldier
-	Fleeing,	// Worker
+	Fleeing,		// Worker
+	Retreating,		// Soldier
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHornetActionDelegate, HornetActions, NewAction);
@@ -69,9 +74,18 @@ private:
 	UPROPERTY()
 	AHornet* Hornet;
 
+	UPROPERTY()
+	AQueen* Queen;
+
 	Octree* HornetOctree;
 	TArray<AHornet*> Neighborhood;
 
 	TEnumAsByte<HornetStates> CurrentState;
 	TEnumAsByte<HornetActions> CurrentAction;
+
+	// TODO: Find a Group Flock
+	TArray<AHornet*> Flock;
+
+	// TODO: Send to Character
+	FVector FlockForce;
 };

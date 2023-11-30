@@ -48,7 +48,8 @@ void AHornet::Tick(float DeltaTime)
 
 	CurrentMoveVector = NewMoveVector;
 
-	(this->**ActionFunctionMap.Find(CurrentAction))();
+	if(ActionFunctionMap.Contains(CurrentAction))
+		(this->**ActionFunctionMap.Find(CurrentAction))();
 
 	UpdateTransform(DeltaTime);
 
@@ -154,27 +155,27 @@ void AHornet::UpdateTransform(float DeltaTime)
 
 void AHornet::Wander()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Wander")));
 }
 
 void AHornet::Swarm()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Swarm")));
 }
 
 void AHornet::Charge()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Charge")));
 }
 
 void AHornet::Chase()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Chase")));
 }
 
 void AHornet::Flee()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Flee")));
 }
 
 /**

@@ -47,6 +47,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	//State & Action Updates
+	UFUNCTION()
+	FORCEINLINE void OnHornetActionUpdated(HornetActions NewAction) { CurrentAction = NewAction; }
+	UFUNCTION()
+	FORCEINLINE void OnHornetStateUpdated(HornetStates NewState) { CurrentState = NewState; }
+
 private:
 
 	void CalculateNewMoveVector();
@@ -64,10 +70,6 @@ private:
 	void Charge();
 	void Chase();
 	void Flee();
-
-	//State & Action Updates
-	FORCEINLINE void OnHornetActionUpdated(const HornetActions NewAction) { CurrentAction = NewAction; }
-	FORCEINLINE void OnHornetStateUpdated(const HornetStates NewState) { CurrentState = NewState; }
 
 	void DrawDebug() const;
 
