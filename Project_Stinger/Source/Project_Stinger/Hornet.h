@@ -14,6 +14,8 @@ class Octree;
 class USphereComponent;
 class UArrowComponent;
 
+typedef void (AHornet::*ActionFunction)();
+
 UCLASS()
 class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairsInterface, public IBulletHitInterface
 {
@@ -58,6 +60,10 @@ private:
 
 	// Action Behaviors
 	void Wander();
+	void Swarm();
+	void Charge();
+	void Chase();
+	void Flee();
 
 	//State & Action Updates
 	FORCEINLINE void OnHornetActionUpdated(const HornetActions NewAction) { CurrentAction = NewAction; }
@@ -129,6 +135,7 @@ private:
 
 	TEnumAsByte<HornetStates> CurrentState;
 	TEnumAsByte<HornetActions> CurrentAction;
+	TMap<HornetActions, ActionFunction> ActionFunctionMap;
 
 	FVector CohesionForce;
 	FVector AlignmentForce;

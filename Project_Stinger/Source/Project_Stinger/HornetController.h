@@ -21,8 +21,8 @@ enum HornetActions
 {
 	Wandering,	// Both
 	Swarming,	// Both
-	Chase,		// Worker
-	Charge,		// Soldier
+	Chasing,		// Worker
+	Charging,		// Soldier
 	Fleeing,	// Worker
 };
 

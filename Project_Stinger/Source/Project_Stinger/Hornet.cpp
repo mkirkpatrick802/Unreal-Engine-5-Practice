@@ -34,6 +34,12 @@ void AHornet::BeginPlay()
 
 	if (AStingerGameMode* GameMode = Cast<AStingerGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
 		GameMode->HornetSpawned(this);
+
+	ActionFunctionMap.Add(Wandering, &AHornet::Wander);
+	ActionFunctionMap.Add(Swarming, &AHornet::Swarm);
+	ActionFunctionMap.Add(Charging, &AHornet::Charge);
+	ActionFunctionMap.Add(Chasing, &AHornet::Chase);
+	ActionFunctionMap.Add(Fleeing, &AHornet::Flee);
 }
 
 void AHornet::Tick(float DeltaTime)
@@ -42,9 +48,7 @@ void AHornet::Tick(float DeltaTime)
 
 	CurrentMoveVector = NewMoveVector;
 
-	//UpdateNeighbourhood();
-
-	CalculateNewMoveVector();
+	(this->**ActionFunctionMap.Find(CurrentAction))();
 
 	UpdateTransform(DeltaTime);
 
@@ -149,6 +153,26 @@ void AHornet::UpdateTransform(float DeltaTime)
 }
 
 void AHornet::Wander()
+{
+
+}
+
+void AHornet::Swarm()
+{
+
+}
+
+void AHornet::Charge()
+{
+
+}
+
+void AHornet::Chase()
+{
+
+}
+
+void AHornet::Flee()
 {
 
 }
