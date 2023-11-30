@@ -44,15 +44,16 @@ void AHornet::BeginPlay()
 	CurrentAction = Swarming;
 
 	MaxSpeed += UKismetMathLibrary::RandomFloatInRange(-1 * MaxSpeedVariance, MaxSpeedVariance);
+	NewMoveVector = UKismetMathLibrary::RandomUnitVector() * MaxSpeed;
 }
 
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	(this->**ActionFunctionMap.Find(CurrentAction))();
-
 	CurrentMoveVector = NewMoveVector;
+
+	(this->**ActionFunctionMap.Find(CurrentAction))();
 
 	UpdateTransform(DeltaTime);
 
@@ -71,9 +72,9 @@ void AHornet::CalculateNewMoveVector()
 		CalculateAlignment();
 		CalculateCohesion();
 		CalculateSeparation();
-		CalculateVariance();
 	}
 
+	CalculateVariance();
 	CalculateCollisions();
 
 	
