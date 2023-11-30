@@ -41,6 +41,7 @@ void AHornetController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	UpdateNeighbourhood();
+	UpdateFlock();
 }
 
 void AHornetController::ChangeAction(HornetActions NewAction)
@@ -77,4 +78,28 @@ void AHornetController::UpdateNeighbourhood()
 	Hornet->SetNeighborhood(Neighborhood);
 
 	ChangeAction(Neighborhood.Num() > 0 ? Swarming : Wandering);
+}
+
+void AHornetController::UpdateFlock()
+{
+	if (!HornetOctree || !Hornet) return;
+
+	// TODO: Test This
+	Flock.Empty();
+	for (auto DirectHornet : Neighborhood)
+	{
+		TArray<AHornet*> Neighbors;
+		DirectHornet->GetNeighborhood(Neighbors);
+		for (auto AnotherHornet : Neighbors)
+		{
+			Flock.AddUnique(AnotherHornet);
+		}
+	}
+}
+
+void AHornetController::CalculateFlockForce()
+{
+	if(CurrentAction == Wandering) return;
+
+	FlockForce = FVector::Zero();
 }

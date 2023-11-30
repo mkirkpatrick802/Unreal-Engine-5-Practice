@@ -40,8 +40,9 @@ public:
 	FORCEINLINE void SetNeighborhood(const TArray<AHornet*>& NewNeighborhood) { Neighborhood = NewNeighborhood; }
 
 	// Getters
-	float GetColliderRadius() const { return SphereCollider->GetUnscaledSphereRadius(); }
-	float GetVisionRadius() const { return VisionRadius; }
+	FORCEINLINE void GetNeighborhood(TArray<AHornet*>& Neighbors) const { Neighbors = Neighborhood; }
+	FORCEINLINE float GetColliderRadius() const { return SphereCollider->GetUnscaledSphereRadius(); }
+	FORCEINLINE float GetVisionRadius() const { return VisionRadius; }
 
 protected:
 
@@ -50,6 +51,7 @@ protected:
 	//State & Action Updates
 	UFUNCTION()
 	FORCEINLINE void OnHornetActionUpdated(HornetActions NewAction) { CurrentAction = NewAction; }
+
 	UFUNCTION()
 	FORCEINLINE void OnHornetStateUpdated(HornetStates NewState) { CurrentState = NewState; }
 

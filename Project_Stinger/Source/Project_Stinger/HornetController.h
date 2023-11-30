@@ -63,6 +63,8 @@ private:
 	void OnPawnDetected(AActor* Actor, FAIStimulus Stimulus);
 
 	void UpdateNeighbourhood();
+	void UpdateFlock();
+	void CalculateFlockForce();
 
 public:
 
@@ -83,9 +85,8 @@ private:
 	TEnumAsByte<HornetStates> CurrentState;
 	TEnumAsByte<HornetActions> CurrentAction;
 
-	// TODO: Find a Group Flock
 	TArray<AHornet*> Flock;
 
-	// TODO: Send to Character
+	// TODO: Calculate Here and Send to Character
 	FVector FlockForce;
 };
