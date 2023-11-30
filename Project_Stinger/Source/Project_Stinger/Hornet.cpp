@@ -40,15 +40,19 @@ void AHornet::BeginPlay()
 	ActionFunctionMap.Add(Charging, &AHornet::Charge);
 	ActionFunctionMap.Add(Chasing, &AHornet::Chase);
 	ActionFunctionMap.Add(Fleeing, &AHornet::Flee);
+
+	CurrentAction = Swarming;
+
+	MaxSpeed += UKismetMathLibrary::RandomFloatInRange(-1 * MaxSpeedVariance, MaxSpeedVariance);
 }
 
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CurrentMoveVector = NewMoveVector;
-
 	(this->**ActionFunctionMap.Find(CurrentAction))();
+
+	CurrentMoveVector = NewMoveVector;
 
 	UpdateTransform(DeltaTime);
 
@@ -67,12 +71,19 @@ void AHornet::CalculateNewMoveVector()
 		CalculateAlignment();
 		CalculateCohesion();
 		CalculateSeparation();
+		CalculateVariance();
 	}
 
 	CalculateCollisions();
 
 	
-	NewMoveVector += AlignmentForce.GetSafeNormal() * AlignmentWeight + CohesionForce * CohesionWeight + SeparationForce * SeparationWeight + CollisionForce;
+	NewMoveVector += 
+		AlignmentForce.GetSafeNormal() * AlignmentWeight + 
+		CohesionForce * CohesionWeight + 
+		SeparationForce * SeparationWeight + 
+		VarianceForce * VarianceWeight +
+		CurrentMoveVector.GetSafeNormal() * ResistanceToChange +
+		CollisionForce;
 }
 
 void AHornet::ResetForces()
@@ -138,6 +149,11 @@ void AHornet::CalculateSeparation()
 	}
 }
 
+void AHornet::CalculateVariance() 
+{
+	VarianceForce = UKismetMathLibrary::RandomUnitVector();
+}
+
 void AHornet::CalculateCollisions()
 {
 	CollisionForce = FVector::Zero();
@@ -159,7 +175,7 @@ void AHornet::Wander()
 
 void AHornet::Swarm()
 {
-
+	CalculateNewMoveVector();
 }
 
 void AHornet::Charge()

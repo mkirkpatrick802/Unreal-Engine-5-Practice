@@ -54,6 +54,7 @@ private:
 	void CalculateAlignment();
 	void CalculateCohesion();
 	void CalculateSeparation();
+	void CalculateVariance();
 	void CalculateCollisions();
 
 	void UpdateTransform(float DeltaTime);
@@ -92,6 +93,9 @@ protected:
 	float MaxSpeed = 350;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MaxSpeedVariance = 50;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 6;
 
 	/**
@@ -124,6 +128,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Flocking")
 	float SeparationWeight = 3000;
 
+	/**
+	*	Random Variance Settings
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float VarianceWeight = 700;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float ResistanceToChange = 300;
+
 private:
 
 	UPROPERTY()
@@ -141,5 +155,6 @@ private:
 	FVector AlignmentForce;
 	FVector SeparationForce;
 	FVector CollisionForce;
+	FVector VarianceForce;
 	FVector NewMoveVector;
 };
