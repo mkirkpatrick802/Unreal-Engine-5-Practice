@@ -46,6 +46,7 @@ void AHornetController::ChangeAction(HornetActions NewAction)
 {
 	if(NewAction == CurrentAction) return;
 	CurrentAction = NewAction;
+	ActionChangedEvent.Broadcast(CurrentAction);
 }
 
 void AHornetController::OnPawnDetected(AActor* Actor, FAIStimulus Stimulus)

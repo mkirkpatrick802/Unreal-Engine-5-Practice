@@ -14,25 +14,17 @@ class Octree;
 class USphereComponent;
 class UArrowComponent;
 
-/**
- *	Hornet Boid
- */
 UCLASS()
 class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairsInterface, public IBulletHitInterface
 {
 	// Object Init & Components
 	GENERATED_BODY()
 
-	DECLARE_DELEGATE(FHornetActionDelegate);
-
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereCollider;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Mesh;
-
-	UPROPERTY(EditAnywhere)
-	UArrowComponent* Arrow;
 
 public:
 
@@ -42,7 +34,7 @@ public:
 	virtual void Destroyed() override;
 
 	// Setters
-	FORCEINLINE void SetTree(Octree* Tree) const { Cast<AHornetController>(GetController())->SetTree(Tree); }
+	FORCEINLINE void SetTree(Octree* Tree) const { HornetController->SetTree(Tree); }
 	FORCEINLINE void SetNeighborhood(const TArray<AHornet*>& NewNeighborhood) { Neighborhood = NewNeighborhood; }
 
 	// Getters
@@ -63,6 +55,10 @@ private:
 	void CalculateCollisions();
 
 	void UpdateTransform(float DeltaTime);
+
+	//State & Action Updates
+	FORCEINLINE void OnHornetActionUpdated(const HornetActions NewAction) { CurrentAction = NewAction; }
+	FORCEINLINE void OnHornetStateUpdated(const HornetStates NewState) { CurrentState = NewState; }
 
 	void DrawDebug() const;
 
@@ -119,8 +115,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Flocking")
 	float SeparationWeight = 3000;
 
-
 private:
+
+	UPROPERTY()
+	AHornetController* HornetController;
 
 	FTransform Transform;
 

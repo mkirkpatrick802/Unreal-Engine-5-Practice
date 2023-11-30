@@ -39,8 +39,11 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 
 void AStingerGameMode::HornetSpawned(AHornet* Hornet)
 {
-	Hornet->SetTree(HornetOctree);
-	Hornets.AddUnique(Hornet);
+	if(Hornet)
+	{
+		Hornet->SetTree(HornetOctree);
+		Hornets.AddUnique(Hornet);
+	}
 }
 
 void AStingerGameMode::HornetDestroyed(AHornet* Hornet)

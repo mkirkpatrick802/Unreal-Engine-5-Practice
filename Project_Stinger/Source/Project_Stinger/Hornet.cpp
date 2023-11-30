@@ -1,8 +1,6 @@
 #include "Hornet.h"
 
-#include "Octree.h"
 #include "StingerGameMode.h"
-#include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -19,11 +17,6 @@ AHornet::AHornet()
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Mesh"));
 	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
-	Arrow = CreateDefaultSubobject<UArrowComponent>(FName("Forward Arrow"));
-	Arrow->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	Arrow->ArrowSize = 1.5;
-	Arrow->ArrowLength = 100;
 }
 
 void AHornet::BeginPlay()
@@ -31,6 +24,13 @@ void AHornet::BeginPlay()
 	Super::BeginPlay();
 
 	Transform = GetActorTransform();
+
+	HornetController = Cast<AHornetController>(GetController());
+	if (HornetController)
+	{
+		HornetController->ActionChangedEvent.AddDynamic(this, &AHornet::OnHornetActionUpdated);
+		HornetController->StateChangedEvent.AddDynamic(this, &AHornet::OnHornetStateUpdated);
+	}
 
 	if (AStingerGameMode* GameMode = Cast<AStingerGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
 		GameMode->HornetSpawned(this);

@@ -26,6 +26,9 @@ enum HornetActions
 	Fleeing,	// Worker
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHornetActionDelegate, HornetActions, NewAction);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHornetStateDelegate, HornetStates, NewState);
+
 UCLASS()
 class PROJECT_STINGER_API AHornetController : public AAIController
 {
@@ -55,6 +58,11 @@ private:
 	void OnPawnDetected(AActor* Actor, FAIStimulus Stimulus);
 
 	void UpdateNeighbourhood();
+
+public:
+
+	FHornetActionDelegate ActionChangedEvent;
+	FHornetStateDelegate StateChangedEvent;
 
 private:
 
