@@ -60,7 +60,6 @@ void AHornet::CalculateNewMoveVector()
 	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%f"), Neighborhood.Num()));
 	if (Neighborhood.Num() > 0)
 	{
-
 		CalculateAlignment();
 		CalculateCohesion();
 		CalculateSeparation();
@@ -147,6 +146,11 @@ void AHornet::UpdateTransform(float DeltaTime)
 	Transform.SetLocation(Transform.GetLocation() + NewDirection);
 	Transform.SetRotation(UKismetMathLibrary::RLerp(Transform.Rotator(),UKismetMathLibrary::MakeRotFromXZ(NewDirection, FVector::UpVector),DeltaTime * MaxRotationSpeed, false).Quaternion());
 	SetActorTransform(Transform);
+}
+
+void AHornet::Wander()
+{
+
 }
 
 /**

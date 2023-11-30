@@ -56,6 +56,9 @@ private:
 
 	void UpdateTransform(float DeltaTime);
 
+	// Action Behaviors
+	void Wander();
+
 	//State & Action Updates
 	FORCEINLINE void OnHornetActionUpdated(const HornetActions NewAction) { CurrentAction = NewAction; }
 	FORCEINLINE void OnHornetStateUpdated(const HornetStates NewState) { CurrentState = NewState; }
@@ -126,7 +129,6 @@ private:
 
 	TEnumAsByte<HornetStates> CurrentState;
 	TEnumAsByte<HornetActions> CurrentAction;
-	TMap<HornetActions, FHornetActionDelegate> ActionFunctionMap;
 
 	FVector CohesionForce;
 	FVector AlignmentForce;
