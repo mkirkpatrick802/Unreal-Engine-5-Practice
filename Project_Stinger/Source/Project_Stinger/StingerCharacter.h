@@ -85,8 +85,6 @@ protected:
 	/** Called for aim input */
 	void ToggleAim(const FInputActionValue& Value);
 
-	void LerpAim();
-
 	void AimOffset(float DeltaTime);
 
 	void ToggleFireWeapon();
