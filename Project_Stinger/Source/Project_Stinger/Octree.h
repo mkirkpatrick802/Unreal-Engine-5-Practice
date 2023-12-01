@@ -32,7 +32,7 @@ public:
 
 	virtual void DrawDebug(const UWorld* World) = 0;
 
-	const int RESIZE_THRESHOLD = 3;
+	const int RESIZE_THRESHOLD = 6;
 	const int MAX_DEPTH = 3;
 
 protected:
