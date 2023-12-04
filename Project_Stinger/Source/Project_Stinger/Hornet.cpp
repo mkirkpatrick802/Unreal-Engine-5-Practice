@@ -249,8 +249,8 @@ void AHornet::DrawDebug() const
 	// DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
 
 	//Draw Connections to Neighbors
-	for (const auto Hornet : Neighborhood)
-	{
-		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
-	}
+	//for (const auto Hornet : Neighborhood)
+	//{
+	//	DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
+	//}
 }

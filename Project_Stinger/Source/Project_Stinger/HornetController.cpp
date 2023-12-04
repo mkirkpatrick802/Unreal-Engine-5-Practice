@@ -43,7 +43,7 @@ void AHornetController::Tick(float DeltaSeconds)
 	if (!HasAuthority()) return;
 
 	UpdateNeighbourhood();
-	UpdateFlock();
+	//UpdateFlock();
 }
 
 void AHornetController::ChangeAction(HornetActions NewAction)
@@ -86,7 +86,6 @@ void AHornetController::UpdateFlock()
 {
 	if (!HornetOctree || !Hornet) return;
 
-	// TODO: Optimize
 	Flock.Empty();
 	for (auto DirectHornet : Neighborhood)
 	{
