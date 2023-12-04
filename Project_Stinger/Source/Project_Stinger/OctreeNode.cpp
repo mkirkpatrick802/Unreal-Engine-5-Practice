@@ -53,7 +53,6 @@ void OctreeNode::Setup()
     }
 }
 
-// TODO: Use Hornet Sphere Radius Instead of Vision Radius
 void OctreeNode::Insert(AHornet* Hornet)
 {
 	/*
@@ -145,10 +144,9 @@ void OctreeNode::Resize()
 {
     for(int i = 0; i < 8; i++)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%d"), Children[i]->GetHornets().Num()));
         if (Children[i]->GetHornets().Num() > RESIZE_THRESHOLD)
         {
-            if (CurrentDepth + 1 > MAX_DEPTH) return;
+            if (CurrentDepth + 1 > MAX_DEPTH) continue;
 
         	Octree* Child = Children[i];
             if (Child->Type != Leaf) continue;
@@ -180,13 +178,14 @@ void OctreeNode::Resize()
 	        }
 
             delete Child;
-
+            continue;
         }
-    	else if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
+
+    	if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
         {
             Octree* Child = Children[i];
 
-            if (Child->Type != Node) return;
+            if (Child->Type != Node) continue;
 
             const float Temp = HalfWidth / 2;
             FVector Offset = Center;
@@ -203,13 +202,6 @@ void OctreeNode::Resize()
             Children[i] = new OctreeLeaf(Offset);
 
             delete Child;
-        }
-        else if (Children[i]->GetHornets().Num() == 0)
-        {
-            Octree* Child = Children[i];
-            if (Child->Type != Node) return;
-
-            GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%d"), Children[i]->GetHornets().Num()));
         }
     }
 
@@ -243,11 +235,59 @@ void OctreeNode::Clear()
     }
 }
 
+// This is the same code as I used for the insert and i believe that it is working well
+// Hopefully it stays that way
 void OctreeNode::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 {
-    for (int i = 0; i < 8; i++)
+    FVector HornetLocation = Hornet->GetActorLocation();
+
+    int BaseZone = 0;
+    for (int i = 0; i < 3; i++)
     {
-        Children[i]->GetNeighbors(Neighbors, Hornet);
+        if (HornetLocation[i] > Center[i])
+        {
+            BaseZone += (1 << i);
+        }
+    }
+
+    Children[BaseZone]->GetNeighbors(Neighbors, Hornet);
+
+    const FVector Difference = HornetLocation - Center;
+
+    int AxisOffset = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        if (Hornet->GetVisionRadius() > FMath::Abs(Difference[i]))
+            AxisOffset += (1 << i);
+    }
+
+    if (AxisOffset > 0)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if ((AxisOffset & 1 << i) != 0)
+                Children[BaseZone ^ 1 << i]->GetNeighbors(Neighbors, Hornet);
+        }
+
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0)
+        {
+            Children[BaseZone ^ 3]->GetNeighbors(Neighbors, Hornet);
+        }
+
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 5]->GetNeighbors(Neighbors, Hornet);
+        }
+
+        if ((AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 6]->GetNeighbors(Neighbors, Hornet);
+        }
+
+        if ((AxisOffset & 1) != 0 && (AxisOffset & 2) != 0 && (AxisOffset & 4) != 0)
+        {
+            Children[BaseZone ^ 7]->GetNeighbors(Neighbors, Hornet);
+        }
     }
 }
 

@@ -58,7 +58,7 @@ void AHornet::Tick(float DeltaTime)
 	if(ActionFunctionMap.Contains(CurrentAction))
 		(this->**ActionFunctionMap.Find(CurrentAction))();
 
-	//UpdateTransform(DeltaTime);
+	UpdateTransform(DeltaTime);
 
 	// Debug
 	DrawDebug();
@@ -135,7 +135,6 @@ void AHornet::CalculateCohesion()
 	FVector dir = CenterMass - Location;
 
 	CohesionForce = (dir / CohesionRadius);
-	
 }
 
 void AHornet::CalculateSeparation()
@@ -179,7 +178,7 @@ void AHornet::Wander()
 
 void AHornet::Swarm()
 {
-	//CalculateNewMoveVector();
+	CalculateNewMoveVector();
 }
 
 void AHornet::Charge()
@@ -226,7 +225,7 @@ void AHornet::DrawDebug() const
 	const FVector& Location = GetActorLocation();
 
 	// Sight Radius
-	// DrawDebugSphere(World, Location, VisionRadius, 10, FColor::Red, false, -1, 1, 1);
+	// DrawDebugSphere(World, Location, VisionRadius, 10, FColor::Blue, false, -1, 1, 1);
 
 	// Movement Vector
 	// DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MoveSpeed, FColor::Green, false, -1, 1, 1.5f);
@@ -250,8 +249,8 @@ void AHornet::DrawDebug() const
 	// DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
 
 	//Draw Connections to Neighbors
-	/*for (const auto Hornet : Neighborhood)
+	for (const auto Hornet : Neighborhood)
 	{
 		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
-	}*/
+	}
 }
