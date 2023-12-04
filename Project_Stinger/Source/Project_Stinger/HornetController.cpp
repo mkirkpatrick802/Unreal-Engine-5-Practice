@@ -40,6 +40,9 @@ void AHornetController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	return;
+	if (!HasAuthority()) return;
+
 	UpdateNeighbourhood();
 	UpdateFlock();
 }
@@ -84,7 +87,7 @@ void AHornetController::UpdateFlock()
 {
 	if (!HornetOctree || !Hornet) return;
 
-	// TODO: Test This
+	// TODO: This is O(n^2) which is awful, so... fix it!
 	Flock.Empty();
 	for (auto DirectHornet : Neighborhood)
 	{

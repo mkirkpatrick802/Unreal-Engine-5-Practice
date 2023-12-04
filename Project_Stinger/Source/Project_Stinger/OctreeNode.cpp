@@ -53,6 +53,7 @@ void OctreeNode::Setup()
     }
 }
 
+// TODO: Use Hornet Sphere Radius Instead of Vision Radius
 void OctreeNode::Insert(AHornet* Hornet)
 {
 	/*
@@ -101,7 +102,7 @@ void OctreeNode::Insert(AHornet* Hornet)
 	int AxisOffset = 0;
     for (int i = 0; i < 3; i++)
     {
-        if (Hornet->GetVisionRadius() > FMath::Abs(Difference[i]))
+        if (Hornet->GetColliderRadius() > FMath::Abs(Difference[i]))
             AxisOffset += (1 << i);
     }
 
@@ -142,12 +143,12 @@ void OctreeNode::Insert(AHornet* Hornet)
 
 void OctreeNode::Resize()
 {
-
     for(int i = 0; i < 8; i++)
     {
-        if(Children[i]->GetHornets().Num() > RESIZE_THRESHOLD)
+        GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%d"), Children[i]->GetHornets().Num()));
+        if (Children[i]->GetHornets().Num() > RESIZE_THRESHOLD)
         {
-            if(CurrentDepth + 1 > MAX_DEPTH) return;
+            if (CurrentDepth + 1 > MAX_DEPTH) return;
 
         	Octree* Child = Children[i];
             if (Child->Type != Leaf) continue;
@@ -180,10 +181,8 @@ void OctreeNode::Resize()
 
             delete Child;
 
-            continue;
         }
-
-        if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
+    	else if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
         {
             Octree* Child = Children[i];
 
@@ -204,6 +203,13 @@ void OctreeNode::Resize()
             Children[i] = new OctreeLeaf(Offset);
 
             delete Child;
+        }
+        else if (Children[i]->GetHornets().Num() == 0)
+        {
+            Octree* Child = Children[i];
+            if (Child->Type != Node) return;
+
+            GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%d"), Children[i]->GetHornets().Num()));
         }
     }
 

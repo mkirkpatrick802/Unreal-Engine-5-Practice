@@ -41,7 +41,7 @@ void AHornet::BeginPlay()
 	ActionFunctionMap.Add(Chasing, &AHornet::Chase);
 	ActionFunctionMap.Add(Fleeing, &AHornet::Flee);
 
-	CurrentAction = Swarming;
+	CurrentAction = Wandering;
 
 	MaxSpeed += UKismetMathLibrary::RandomFloatInRange(-1 * MaxSpeedVariance, MaxSpeedVariance);
 	NewMoveVector = UKismetMathLibrary::RandomUnitVector() * MaxSpeed;
@@ -51,12 +51,14 @@ void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!HasAuthority()) return;
+
 	CurrentMoveVector = NewMoveVector;
 
 	if(ActionFunctionMap.Contains(CurrentAction))
 		(this->**ActionFunctionMap.Find(CurrentAction))();
 
-	UpdateTransform(DeltaTime);
+	//UpdateTransform(DeltaTime);
 
 	// Debug
 	DrawDebug();
@@ -172,12 +174,12 @@ void AHornet::UpdateTransform(float DeltaTime)
 
 void AHornet::Wander()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Wander")));
+	//CalculateNewMoveVector();
 }
 
 void AHornet::Swarm()
 {
-	CalculateNewMoveVector();
+	//CalculateNewMoveVector();
 }
 
 void AHornet::Charge()
