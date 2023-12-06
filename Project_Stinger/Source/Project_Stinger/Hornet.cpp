@@ -10,13 +10,12 @@ AHornet::AHornet()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
-	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SphereCollider->SetSphereRadius(100);
 	SphereCollider->SetMobility(EComponentMobility::Movable);
 	SetRootComponent(SphereCollider);
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Mesh"));
-	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Mesh->SetupAttachment(RootComponent);
 }
 
 void AHornet::BeginPlay()
@@ -58,6 +57,7 @@ void AHornet::Tick(float DeltaTime)
 	if(ActionFunctionMap.Contains(CurrentAction))
 		(this->**ActionFunctionMap.Find(CurrentAction))();
 
+	// TODO: Causing Performance Drops
 	UpdateTransform(DeltaTime);
 
 	// Debug
