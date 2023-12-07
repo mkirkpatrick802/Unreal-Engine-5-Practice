@@ -293,7 +293,6 @@ void OctreeNode::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 
 void OctreeNode::DrawDebug(const UWorld* World)
 {
-
     for (int i = 0; i < 8; i++)
     {
         Children[i]->DrawDebug(World);

@@ -32,4 +32,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float OctreeStartingHalfWidth = 5000;
+
+	UPROPERTY(EditAnywhere)
+	bool DisplayOctree = true;
 };
