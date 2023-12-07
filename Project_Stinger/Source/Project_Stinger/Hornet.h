@@ -22,10 +22,12 @@ class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairs
 	// Object Init & Components
 	GENERATED_BODY()
 
+public:
+
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereCollider;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* Mesh;
 
 public:
