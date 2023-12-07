@@ -33,19 +33,36 @@ void AHornetController::BeginPlay()
 	Super::BeginPlay();
 
 	Hornet = Cast<AHornet>(GetPawn());
+	CurrentAction = Wandering;
 }
 
 void AHornetController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!HasAuthority()) return;
+
 	UpdateNeighbourhood();
+	//UpdateFlock();
 }
 
 void AHornetController::ChangeAction(HornetActions NewAction)
 {
 	if(NewAction == CurrentAction) return;
 	CurrentAction = NewAction;
+
+	if(CurrentState == Soldier)
+	{
+		if (CurrentAction == Swarming)
+			CurrentAction = Flocking;
+
+		if (CurrentAction == Chasing)
+			CurrentAction = Charging;
+
+		//if (CurrentAction == Fleeing)
+		//	CurrentAction = Retreating;
+	}
+
 	ActionChangedEvent.Broadcast(CurrentAction);
 }
 
@@ -63,4 +80,27 @@ void AHornetController::UpdateNeighbourhood()
 	Hornet->SetNeighborhood(Neighborhood);
 
 	ChangeAction(Neighborhood.Num() > 0 ? Swarming : Wandering);
+}
+
+void AHornetController::UpdateFlock()
+{
+	if (!HornetOctree || !Hornet) return;
+
+	Flock.Empty();
+	for (auto DirectHornet : Neighborhood)
+	{
+		TArray<AHornet*> Neighbors;
+		DirectHornet->GetNeighborhood(Neighbors);
+		for (auto AnotherHornet : Neighbors)
+		{
+			Flock.AddUnique(AnotherHornet);
+		}
+	}
+}
+
+void AHornetController::CalculateFlockForce()
+{
+	if(CurrentAction == Wandering) return;
+
+	FlockForce = FVector::Zero();
 }

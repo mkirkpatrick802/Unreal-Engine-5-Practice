@@ -22,10 +22,12 @@ class PROJECT_STINGER_API AHornet : public APawn, public IInteractWithCrosshairs
 	// Object Init & Components
 	GENERATED_BODY()
 
+public:
+
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereCollider;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* Mesh;
 
 public:
@@ -40,12 +42,20 @@ public:
 	FORCEINLINE void SetNeighborhood(const TArray<AHornet*>& NewNeighborhood) { Neighborhood = NewNeighborhood; }
 
 	// Getters
-	float GetColliderRadius() const { return SphereCollider->GetUnscaledSphereRadius(); }
-	float GetVisionRadius() const { return VisionRadius; }
+	FORCEINLINE void GetNeighborhood(TArray<AHornet*>& Neighbors) const { Neighbors = Neighborhood; }
+	FORCEINLINE float GetColliderRadius() const { return SphereCollider->GetUnscaledSphereRadius(); }
+	FORCEINLINE float GetVisionRadius() const { return VisionRadius; }
 
 protected:
 
 	virtual void BeginPlay() override;
+
+	//State & Action Updates
+	UFUNCTION()
+	FORCEINLINE void OnHornetActionUpdated(HornetActions NewAction) { CurrentAction = NewAction; }
+
+	UFUNCTION()
+	FORCEINLINE void OnHornetStateUpdated(HornetStates NewState) { CurrentState = NewState; }
 
 private:
 
@@ -54,6 +64,7 @@ private:
 	void CalculateAlignment();
 	void CalculateCohesion();
 	void CalculateSeparation();
+	void CalculateVariance();
 	void CalculateCollisions();
 
 	void UpdateTransform(float DeltaTime);
@@ -64,10 +75,6 @@ private:
 	void Charge();
 	void Chase();
 	void Flee();
-
-	//State & Action Updates
-	FORCEINLINE void OnHornetActionUpdated(const HornetActions NewAction) { CurrentAction = NewAction; }
-	FORCEINLINE void OnHornetStateUpdated(const HornetStates NewState) { CurrentState = NewState; }
 
 	void DrawDebug() const;
 
@@ -90,6 +97,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxSpeed = 350;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MaxSpeedVariance = 50;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 6;
@@ -124,6 +134,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Flocking")
 	float SeparationWeight = 3000;
 
+	/**
+	*	Random Variance Settings
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float VarianceWeight = 700;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float ResistanceToChange = 300;
+
 private:
 
 	UPROPERTY()
@@ -141,5 +161,6 @@ private:
 	FVector AlignmentForce;
 	FVector SeparationForce;
 	FVector CollisionForce;
+	FVector VarianceForce;
 	FVector NewMoveVector;
 };

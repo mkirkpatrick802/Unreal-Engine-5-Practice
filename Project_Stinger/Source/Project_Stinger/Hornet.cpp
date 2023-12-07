@@ -10,13 +10,12 @@ AHornet::AHornet()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(FName("Sphere Collider"));
-	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SphereCollider->SetSphereRadius(100);
 	SphereCollider->SetMobility(EComponentMobility::Movable);
 	SetRootComponent(SphereCollider);
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Mesh"));
-	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Mesh->SetupAttachment(RootComponent);
 }
 
 void AHornet::BeginPlay()
@@ -40,16 +39,25 @@ void AHornet::BeginPlay()
 	ActionFunctionMap.Add(Charging, &AHornet::Charge);
 	ActionFunctionMap.Add(Chasing, &AHornet::Chase);
 	ActionFunctionMap.Add(Fleeing, &AHornet::Flee);
+
+	CurrentAction = Wandering;
+
+	MaxSpeed += UKismetMathLibrary::RandomFloatInRange(-1 * MaxSpeedVariance, MaxSpeedVariance);
+	NewMoveVector = UKismetMathLibrary::RandomUnitVector() * MaxSpeed;
 }
 
 void AHornet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!HasAuthority()) return;
+
 	CurrentMoveVector = NewMoveVector;
 
-	(this->**ActionFunctionMap.Find(CurrentAction))();
+	if(ActionFunctionMap.Contains(CurrentAction))
+		(this->**ActionFunctionMap.Find(CurrentAction))();
 
+	// TODO: Causing Performance Drops
 	UpdateTransform(DeltaTime);
 
 	// Debug
@@ -69,10 +77,17 @@ void AHornet::CalculateNewMoveVector()
 		CalculateSeparation();
 	}
 
+	CalculateVariance();
 	CalculateCollisions();
 
 	
-	NewMoveVector += AlignmentForce.GetSafeNormal() * AlignmentWeight + CohesionForce * CohesionWeight + SeparationForce * SeparationWeight + CollisionForce;
+	NewMoveVector += 
+		AlignmentForce.GetSafeNormal() * AlignmentWeight + 
+		CohesionForce * CohesionWeight + 
+		SeparationForce * SeparationWeight + 
+		VarianceForce * VarianceWeight +
+		CurrentMoveVector.GetSafeNormal() * ResistanceToChange +
+		CollisionForce;
 }
 
 void AHornet::ResetForces()
@@ -120,7 +135,6 @@ void AHornet::CalculateCohesion()
 	FVector dir = CenterMass - Location;
 
 	CohesionForce = (dir / CohesionRadius);
-	
 }
 
 void AHornet::CalculateSeparation()
@@ -136,6 +150,11 @@ void AHornet::CalculateSeparation()
 			SeparationForce += Vector / Vector.SquaredLength();
 		}
 	}
+}
+
+void AHornet::CalculateVariance() 
+{
+	VarianceForce = UKismetMathLibrary::RandomUnitVector();
 }
 
 void AHornet::CalculateCollisions()
@@ -154,27 +173,27 @@ void AHornet::UpdateTransform(float DeltaTime)
 
 void AHornet::Wander()
 {
-
+	//CalculateNewMoveVector();
 }
 
 void AHornet::Swarm()
 {
-
+	CalculateNewMoveVector();
 }
 
 void AHornet::Charge()
 {
-
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Charge")));
 }
 
 void AHornet::Chase()
 {
-
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Chase")));
 }
 
 void AHornet::Flee()
 {
-
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Flee")));
 }
 
 /**
@@ -206,7 +225,7 @@ void AHornet::DrawDebug() const
 	const FVector& Location = GetActorLocation();
 
 	// Sight Radius
-	// DrawDebugSphere(World, Location, VisionRadius, 10, FColor::Red, false, -1, 1, 1);
+	// DrawDebugSphere(World, Location, VisionRadius, 10, FColor::Blue, false, -1, 1, 1);
 
 	// Movement Vector
 	// DrawDebugLine(World, Location, Location + CurrentMoveVector.GetSafeNormal() * MoveSpeed, FColor::Green, false, -1, 1, 1.5f);
@@ -230,8 +249,8 @@ void AHornet::DrawDebug() const
 	// DrawDebugLine(World, Location,Location + SeparationForce.GetSafeNormal() * SeparationWeight * 50, FColor::Blue, false, -1, 0, 1.5f);
 
 	//Draw Connections to Neighbors
-	/*for (const auto Hornet : Neighborhood)
-	{
-		DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
-	}*/
+	//for (const auto Hornet : Neighborhood)
+	//{
+	//	DrawDebugLine(World, Location, Hornet->GetActorLocation(), FColor::Yellow, false, -1, 0, 1.5f);
+	//}
 }

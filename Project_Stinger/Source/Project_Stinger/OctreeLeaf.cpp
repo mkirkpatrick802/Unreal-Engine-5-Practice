@@ -23,10 +23,10 @@ void OctreeLeaf::Clear()
 	Hornets.Empty();
 }
 
+// TODO: This may need to be optimized
 void OctreeLeaf::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 {
 	if(Hornets.IsEmpty()) return;
-	if(!Hornets.Contains(Hornet)) return;
 
 	FVector HornetLoc = Hornet->GetActorLocation();
 	for (auto Child : Hornets)
@@ -51,7 +51,7 @@ void OctreeLeaf::DrawDebug(const UWorld* World)
 {
 	if(Hornets.IsEmpty()) return;
 
-	// DrawDebugSphere(World, Center, 200, 20, FColor::Blue, false, -1, 0, 5);
+	//DrawDebugSphere(World, Center, 200, 20, FColor::Blue, false, -1, 0, 5);
 }
 
 void OctreeLeaf::Resize()
