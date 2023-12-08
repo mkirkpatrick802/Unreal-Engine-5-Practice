@@ -173,7 +173,8 @@ void AHornet::UpdateTransform(float DeltaTime)
 
 void AHornet::Wander()
 {
-	//CalculateNewMoveVector();
+
+	CalculateNewMoveVector();
 }
 
 void AHornet::Swarm()

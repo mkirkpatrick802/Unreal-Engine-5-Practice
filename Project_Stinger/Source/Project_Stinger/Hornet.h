@@ -104,44 +104,46 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 6;
 
+
+
 	/**
 	 *	Alignment Settings
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float AlignmentRadius = 1500;
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float AlignmentWeight = 15;
 
 	/**
 	 *	Cohesion Settings
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float CohesionRadius = 1500;
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float CohesionWeight = 500;
 
 	/**
 	 *	Separation Settings
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float SeparationRadius = 600;
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float SeparationWeight = 3000;
 
 	/**
 	*	Random Variance Settings
 	*/
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float VarianceWeight = 700;
 
-	UPROPERTY(EditAnywhere, Category = "Flocking")
+	//UPROPERTY(EditAnywhere, Category = "Flocking")
 	float ResistanceToChange = 300;
 
 private:
