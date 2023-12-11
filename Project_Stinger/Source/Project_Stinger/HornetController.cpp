@@ -34,6 +34,8 @@ void AHornetController::BeginPlay()
 
 	Hornet = Cast<AHornet>(GetPawn());
 	CurrentAction = Wandering;
+
+	HornetOctree->GetBounds(OctreeBoundsMin, OctreeBoundsMax);
 }
 
 void AHornetController::Tick(float DeltaSeconds)
@@ -44,6 +46,46 @@ void AHornetController::Tick(float DeltaSeconds)
 
 	UpdateNeighbourhood();
 	//UpdateFlock();
+}
+
+FVector AHornetController::CalculateAvoidanceDirection()
+{
+	FVector ActorPosition = Hornet->GetActorLocation();
+
+	ActorPosition.X = FMath::Clamp(ActorPosition.X, OctreeBoundsMin.X, OctreeBoundsMax.X);
+	ActorPosition.Y = FMath::Clamp(ActorPosition.Y, OctreeBoundsMin.Y, OctreeBoundsMax.Y);
+	ActorPosition.Z = FMath::Clamp(ActorPosition.Z, OctreeBoundsMin.Z, OctreeBoundsMax.Z);
+
+	FVector AvoidanceVector = FVector::ZeroVector;
+
+	if (ActorPosition.X == OctreeBoundsMin.X || ActorPosition.X == OctreeBoundsMax.X)
+	{
+		AvoidanceVector.X = -FMath::Sign(ActorPosition.X - (OctreeBoundsMin.X + OctreeBoundsMax.X) * 0.5f);
+	}
+
+	if (ActorPosition.Y == OctreeBoundsMin.Y || ActorPosition.Y == OctreeBoundsMax.Y)
+	{
+		AvoidanceVector.Y = -FMath::Sign(ActorPosition.Y - (OctreeBoundsMin.Y + OctreeBoundsMax.Y) * 0.5f);
+	}
+
+	if (ActorPosition.Z == OctreeBoundsMin.Z || ActorPosition.Z == OctreeBoundsMax.Z)
+	{
+		AvoidanceVector.Z = -FMath::Sign(ActorPosition.Z - (OctreeBoundsMin.Z + OctreeBoundsMax.Z) * 0.5f);
+	}
+
+	FVector RayStart = ActorPosition;
+	FVector RayEnd = ActorPosition + Hornet->GetActorForwardVector() * 100;
+
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, RayStart, RayEnd, ECC_Visibility, CollisionParams))
+		AvoidanceVector += HitResult.ImpactNormal;
+
+	AvoidanceVector.Normalize();
+
+	return AvoidanceVector;
 }
 
 void AHornetController::ChangeAction(HornetActions NewAction)

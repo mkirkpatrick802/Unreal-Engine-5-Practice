@@ -65,7 +65,6 @@ private:
 	void CalculateCohesion();
 	void CalculateSeparation();
 	void CalculateVariance();
-	void CalculateCollisions();
 
 	void UpdateTransform(float DeltaTime);
 
@@ -144,6 +143,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Flocking")
 	float ResistanceToChange = 300;
 
+	/**
+	*	Avoidance Settings
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float AvoidanceWeight = 1000;
+
 private:
 
 	UPROPERTY()
@@ -160,7 +166,7 @@ private:
 	FVector CohesionForce;
 	FVector AlignmentForce;
 	FVector SeparationForce;
-	FVector CollisionForce;
 	FVector VarianceForce;
+	FVector AvoidanceForce;
 	FVector NewMoveVector;
 };

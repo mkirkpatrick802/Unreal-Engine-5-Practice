@@ -21,6 +21,8 @@ public:
 	static Octree* Create(const FVector& Center, float HalfWidth, int Depth = 1);
 	// TODO: Make a cleanup function
 
+	static void GetBounds(FVector& Min, FVector& Max);
+
 	virtual void Insert(AHornet* Hornet) = 0;
 	virtual TArray<AHornet*> GetHornets() = 0;
 	virtual void Clear() = 0;
@@ -42,5 +44,7 @@ protected:
 private:
 
 	inline static bool RootSet = false;
+	inline static FVector BoundsMin = FVector::Zero();
+	inline static FVector BoundsMax = FVector::Zero();
 
 };

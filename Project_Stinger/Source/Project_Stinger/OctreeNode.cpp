@@ -144,6 +144,7 @@ void OctreeNode::Resize()
 {
     for(int i = 0; i < 8; i++)
     {
+        // Grow
         if (Children[i]->GetHornets().Num() > RESIZE_THRESHOLD)
         {
             if (CurrentDepth + 1 > MAX_DEPTH) continue;
@@ -181,6 +182,7 @@ void OctreeNode::Resize()
             continue;
         }
 
+        // Shrink
     	if (Children[i]->GetHornets().Num() < RESIZE_THRESHOLD && Children[i]->GetHornets().Num() != 0)
         {
             Octree* Child = Children[i];
@@ -293,6 +295,7 @@ void OctreeNode::GetNeighbors(TArray<AHornet*>& Neighbors, AHornet* Hornet)
 
 void OctreeNode::DrawDebug(const UWorld* World)
 {
+
     for (int i = 0; i < 8; i++)
     {
         Children[i]->DrawDebug(World);

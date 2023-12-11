@@ -51,6 +51,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	FVector CalculateAvoidanceDirection();
 
 	// Setters
 	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
@@ -87,6 +88,8 @@ private:
 
 	TArray<AHornet*> Flock;
 
-	// TODO: Calculate Here and Send to Character
 	FVector FlockForce;
+
+	FVector OctreeBoundsMin;
+	FVector OctreeBoundsMax;
 };

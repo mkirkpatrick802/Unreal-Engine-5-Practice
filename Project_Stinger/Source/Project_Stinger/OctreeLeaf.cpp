@@ -49,8 +49,7 @@ TArray<AHornet*> OctreeLeaf::GetHornets()
 
 void OctreeLeaf::DrawDebug(const UWorld* World)
 {
-	if(Hornets.IsEmpty()) return;
-
+	if (Hornets.IsEmpty()) return;
 	//DrawDebugSphere(World, Center, 200, 20, FColor::Blue, false, -1, 0, 5);
 }
 

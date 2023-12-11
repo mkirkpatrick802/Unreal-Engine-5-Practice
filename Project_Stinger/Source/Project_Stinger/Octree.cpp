@@ -5,6 +5,12 @@
 
 Octree* Octree::Create(const FVector& Center, float HalfWidth, int Depth)
 {
+    if(BoundsMin == FVector::ZeroVector || BoundsMax == FVector::ZeroVector)
+    {
+        BoundsMin = FVector(Center.X - HalfWidth, Center.Y - HalfWidth, Center.Z - HalfWidth);
+        BoundsMax = FVector(Center.X + HalfWidth, Center.Y + HalfWidth, Center.Z + HalfWidth);
+    }
+
     if (Depth == 0)
     {
         return new OctreeLeaf(Center);
@@ -60,4 +66,10 @@ Octree* Octree::Create(const FVector& Center, float HalfWidth, int Depth)
 
         return Node;
     }
+}
+
+void Octree::GetBounds(FVector& Min, FVector& Max)
+{
+    Min = BoundsMin;
+    Max = BoundsMax;
 }
