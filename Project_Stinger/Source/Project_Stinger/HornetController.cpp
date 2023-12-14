@@ -74,7 +74,7 @@ FVector AHornetController::CalculateAvoidanceDirection()
 	}
 
 	FVector RayStart = ActorPosition;
-	FVector RayEnd = ActorPosition + Hornet->GetActorForwardVector() * 100;
+	FVector RayEnd = ActorPosition + Hornet->GetActorForwardVector() * 200;
 
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
