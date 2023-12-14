@@ -35,12 +35,11 @@ void AHornet::BeginPlay()
 		GameMode->HornetSpawned(this);
 
 	ActionFunctionMap.Add(Wandering, &AHornet::Wander);
+	ActionFunctionMap.Add(Flocking, &AHornet::Flock);
 	ActionFunctionMap.Add(Swarming, &AHornet::Swarm);
 	ActionFunctionMap.Add(Charging, &AHornet::Charge);
 	ActionFunctionMap.Add(Chasing, &AHornet::Chase);
 	ActionFunctionMap.Add(Fleeing, &AHornet::Flee);
-
-	CurrentAction = Wandering;
 
 	MaxSpeed += UKismetMathLibrary::RandomFloatInRange(-1 * MaxSpeedVariance, MaxSpeedVariance);
 	NewMoveVector = UKismetMathLibrary::RandomUnitVector() * MaxSpeed;
@@ -167,28 +166,55 @@ void AHornet::UpdateTransform(float DeltaTime)
 
 void AHornet::Wander()
 {
-
+	//ResetForces();
+	Flock();
 	CalculateNewMoveVector();
 }
 
 void AHornet::Swarm()
 {
+	AlignmentRadius = SwarmAlignmentRadius;
+	AlignmentWeight = SwarmAlignmentWeight;
+	CohesionRadius = SwarmCohesionRadius;
+	CohesionWeight = SwarmCohesionWeight;
+	SeparationRadius = SwarmSeparationRadius;
+	SeparationWeight = SwarmSeparationWeight;
+	VarianceWeight = SwarmVarianceWeight;
+	ResistanceToChange = SwarmResistanceToChange;
+	AvoidanceWeight = SwarmAvoidanceWeight;
+
+	CalculateNewMoveVector();
+}
+
+void AHornet::Flock()
+{
+	//Needs ref to queen
+	AlignmentRadius = FlockingAlignmentRadius;
+	AlignmentWeight = FlockingAlignmentWeight;
+	CohesionRadius = FlockingCohesionRadius;
+	CohesionWeight = FlockingCohesionWeight;
+	SeparationRadius = FlockingSeparationRadius;
+	SeparationWeight = FlockingSeparationWeight;
+	VarianceWeight = FlockingVarianceWeight;
+	ResistanceToChange = FlockingResistanceToChange;
+	AvoidanceWeight = FlockingAvoidanceWeight;
+
 	CalculateNewMoveVector();
 }
 
 void AHornet::Charge()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Charge")));
+	//Need player location or a target
 }
 
 void AHornet::Chase()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Chase")));
+	//Need player location or a target
 }
 
 void AHornet::Flee()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Flee")));
+	//Need player location or a target
 }
 
 /**

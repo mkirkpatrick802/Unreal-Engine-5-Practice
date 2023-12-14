@@ -71,6 +71,7 @@ private:
 	// Action Behaviors
 	void Wander();
 	void Swarm();
+	void Flock();
 	void Charge();
 	void Chase();
 	void Flee();
@@ -103,53 +104,73 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxRotationSpeed = 6;
 
+	//Swarm
 
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmAlignmentRadius = 1500;
 
-	/**
-	 *	Alignment Settings
-	 */
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmAlignmentWeight = 15;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentRadius = 1500;
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmCohesionRadius = 1500;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float AlignmentWeight = 15;
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmCohesionWeight = 500;
 
-	/**
-	 *	Cohesion Settings
-	 */
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmSeparationRadius = 600;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionRadius = 1500;
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmSeparationWeight = 3000;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float CohesionWeight = 500;
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmVarianceWeight = 700;
 
-	/**
-	 *	Separation Settings
-	 */
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmResistanceToChange = 300;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float SeparationRadius = 600;
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmAvoidanceWeight = 1000;
 
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float SeparationWeight = 3000;
-
-	/**
-	*	Random Variance Settings
-	*/
-
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float VarianceWeight = 700;
-
-	//UPROPERTY(EditAnywhere, Category = "Flocking")
-	float ResistanceToChange = 300;
-
-	/**
-	*	Avoidance Settings
-	*/
+	//Flocking
 
 	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingAlignmentRadius = 1500;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingAlignmentWeight = 15;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingCohesionRadius = 1500;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingCohesionWeight = 500;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingSeparationRadius = 600;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingSeparationWeight = 3000;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingVarianceWeight = 700;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingResistanceToChange = 300;
+
+	UPROPERTY(EditAnywhere, Category = "Flocking")
+	float FlockingAvoidanceWeight = 1000;
+
+	
+	float AlignmentRadius = 1500;
+	float AlignmentWeight = 15;
+	float CohesionRadius = 1500;
+	float CohesionWeight = 500;
+	float SeparationRadius = 600;
+	float SeparationWeight = 3000;
+	float VarianceWeight = 700;
+	float ResistanceToChange = 300;
 	float AvoidanceWeight = 1000;
 
 private:
