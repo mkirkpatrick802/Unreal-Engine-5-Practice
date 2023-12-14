@@ -30,6 +30,8 @@ private:
 	UPROPERTY()
 	TArray<AHornet*> Hornets;
 
+	float OctreeStartingHalfWidth = 2000;
+
 	UPROPERTY(EditAnywhere)
-	float OctreeStartingHalfWidth = 5000;
+	bool DisplayOctree = true;
 };

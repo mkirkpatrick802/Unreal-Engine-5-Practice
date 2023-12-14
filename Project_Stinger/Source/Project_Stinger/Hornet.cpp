@@ -57,7 +57,6 @@ void AHornet::Tick(float DeltaTime)
 	if(ActionFunctionMap.Contains(CurrentAction))
 		(this->**ActionFunctionMap.Find(CurrentAction))();
 
-	// TODO: Causing Performance Drops
 	UpdateTransform(DeltaTime);
 
 	// Debug
@@ -78,8 +77,7 @@ void AHornet::CalculateNewMoveVector()
 	}
 
 	CalculateVariance();
-	CalculateCollisions();
-
+	AvoidanceForce = HornetController->CalculateAvoidanceDirection();
 	
 	NewMoveVector += 
 		AlignmentForce.GetSafeNormal() * AlignmentWeight + 
@@ -87,7 +85,7 @@ void AHornet::CalculateNewMoveVector()
 		SeparationForce * SeparationWeight + 
 		VarianceForce * VarianceWeight +
 		CurrentMoveVector.GetSafeNormal() * ResistanceToChange +
-		CollisionForce;
+		AvoidanceForce * AvoidanceWeight;
 }
 
 void AHornet::ResetForces()
@@ -95,6 +93,7 @@ void AHornet::ResetForces()
 	CohesionForce = FVector::Zero();
 	AlignmentForce = FVector::Zero();
 	SeparationForce = FVector::Zero();
+	AvoidanceForce = FVector::Zero();
 	NewMoveVector = FVector::Zero();
 }
 
@@ -155,11 +154,6 @@ void AHornet::CalculateSeparation()
 void AHornet::CalculateVariance() 
 {
 	VarianceForce = UKismetMathLibrary::RandomUnitVector();
-}
-
-void AHornet::CalculateCollisions()
-{
-	CollisionForce = FVector::Zero();
 }
 
 void AHornet::UpdateTransform(float DeltaTime)

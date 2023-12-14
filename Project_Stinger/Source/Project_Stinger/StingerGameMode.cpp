@@ -34,7 +34,9 @@ void AStingerGameMode::Tick(float DeltaSeconds)
 		HornetOctree->Insert(Hornet);
 
 	HornetOctree->Resize();
-	HornetOctree->DrawDebug(GetWorld());
+
+	if(DisplayOctree)
+		HornetOctree->DrawDebug(GetWorld());
 }
 
 void AStingerGameMode::HornetSpawned(AHornet* Hornet)
