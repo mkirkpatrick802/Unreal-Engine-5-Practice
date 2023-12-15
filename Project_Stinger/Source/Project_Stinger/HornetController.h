@@ -35,7 +35,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHornetActionDelegate, HornetActions
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHornetStateDelegate, HornetStates, NewState);
 
 UCLASS()
-class PROJECT_STINGER_API AHornetController : public AAIController
+class PROJECT_STINGER_API AHornetController : public AAIController//, public ACharacter
 {
 	GENERATED_BODY()
 
@@ -44,6 +44,9 @@ class PROJECT_STINGER_API AHornetController : public AAIController
 
 	UPROPERTY(VisibleAnywhere)
 	UAISenseConfig_Sight* SightConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ToggleFlockStateAction;
 
 public:
 
@@ -55,6 +58,9 @@ public:
 
 	// Setters
 	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleFlockState(const FInputActionValue& Value);
 
 private:
 

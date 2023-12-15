@@ -44,6 +44,11 @@ void AHornetController::Tick(float DeltaSeconds)
 
 	if (!HasAuthority()) return;
 
+	/*if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
+
+		EnhancedInputComponent->BindAction(ToggleFlockStateAction, ETriggerEvent::Started, this, &AHornetController::ToggleFlockState);
+	}*/
+
 	UpdateNeighbourhood();
 	//UpdateFlock();
 }
@@ -145,4 +150,17 @@ void AHornetController::CalculateFlockForce()
 	if(CurrentAction == Wandering) return;
 
 	FlockForce = FVector::Zero();
+}
+
+void AHornetController::ToggleFlockState(const FInputActionValue& Value)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Flock State Change Fired")));
+	if (CurrentState == Soldier) 
+	{
+		CurrentState = Worker;
+	}
+	else if (CurrentState == Worker)
+	{
+		CurrentState = Soldier;
+	}
 }
