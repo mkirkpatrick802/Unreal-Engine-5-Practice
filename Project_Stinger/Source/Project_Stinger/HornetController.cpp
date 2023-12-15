@@ -4,6 +4,8 @@
 #include "Octree.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 AHornetController::AHornetController()
 {
@@ -33,7 +35,6 @@ void AHornetController::BeginPlay()
 	Super::BeginPlay();
 
 	Hornet = Cast<AHornet>(GetPawn());
-	CurrentAction = Wandering;
 
 	HornetOctree->GetBounds(OctreeBoundsMin, OctreeBoundsMax);
 }
@@ -44,14 +45,18 @@ void AHornetController::Tick(float DeltaSeconds)
 
 	if (!HasAuthority()) return;
 
-	/*if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-
-		EnhancedInputComponent->BindAction(ToggleFlockStateAction, ETriggerEvent::Started, this, &AHornetController::ToggleFlockState);
-	}*/
 
 	UpdateNeighbourhood();
 	//UpdateFlock();
 }
+
+//void AHornetController::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) 
+//{
+//	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
+//
+//		EnhancedInputComponent->BindAction(ToggleFlockStateAction, ETriggerEvent::Started, this, &AHornetController::ToggleFlockState);
+//	}
+//}
 
 FVector AHornetController::CalculateAvoidanceDirection()
 {
@@ -110,6 +115,7 @@ void AHornetController::ChangeAction(HornetActions NewAction)
 		//	CurrentAction = Retreating;
 	}
 
+	//GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("%d"), CurrentAction.GetIntValue()));
 	ActionChangedEvent.Broadcast(CurrentAction);
 }
 
@@ -126,7 +132,7 @@ void AHornetController::UpdateNeighbourhood()
 	HornetOctree->GetNeighbors(Neighborhood, Hornet);
 	Hornet->SetNeighborhood(Neighborhood);
 
-	ChangeAction(Neighborhood.Num() > 0 ? Swarming : Wandering);
+	ChangeAction(Neighborhood.Num() > 0 ? Flocking : Wandering);
 }
 
 void AHornetController::UpdateFlock()
@@ -152,15 +158,16 @@ void AHornetController::CalculateFlockForce()
 	FlockForce = FVector::Zero();
 }
 
-void AHornetController::ToggleFlockState(const FInputActionValue& Value)
+void AHornetController::ToggleFlockState()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15, FColor::Cyan, FString::Printf(TEXT("Flock State Change Fired")));
 	if (CurrentState == Soldier) 
 	{
 		CurrentState = Worker;
+		ChangeAction(Swarming);
 	}
 	else if (CurrentState == Worker)
 	{
 		CurrentState = Soldier;
+		ChangeAction(Flocking);
 	}
 }

@@ -45,8 +45,8 @@ class PROJECT_STINGER_API AHornetController : public AAIController//, public ACh
 	UPROPERTY(VisibleAnywhere)
 	UAISenseConfig_Sight* SightConfig;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ToggleFlockStateAction;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ToggleFlockStateAction;*/
 
 public:
 
@@ -60,7 +60,7 @@ public:
 	FORCEINLINE void SetTree(Octree* Tree) { HornetOctree = Tree; }
 
 	UFUNCTION(BlueprintCallable)
-	void ToggleFlockState(const FInputActionValue& Value);
+	void ToggleFlockState();
 
 private:
 
@@ -98,4 +98,6 @@ private:
 
 	FVector OctreeBoundsMin;
 	FVector OctreeBoundsMax;
+protected:
+	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };
